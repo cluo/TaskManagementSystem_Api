@@ -1,4 +1,7 @@
 # compiled output
 /debug
 /lastupdate.tmp
-/taskmanagementapi
+/TaskManagementSystem_Api
+
+
+/routers/commentsRouter_*.go

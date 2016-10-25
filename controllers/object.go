@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"TaskManagementApi/models"
+	"TaskManagementSystem_Api/models"
 	"encoding/json"
 
 	"github.com/astaxie/beego"
@@ -89,4 +89,3 @@ func (o *ObjectController) Delete() {
 	o.Data["json"] = "delete success!"
 	o.ServeJSON()
 }
-
