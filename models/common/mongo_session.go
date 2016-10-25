@@ -6,8 +6,8 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-// MongoDBSessionStruct 定义
-type MongoDBSessionStruct struct {
+// MongoSessionStruct 定义
+type MongoSessionStruct struct {
 	session    *mgo.Session
 	db         *mgo.Database
 	collection *mgo.Collection
@@ -15,25 +15,25 @@ type MongoDBSessionStruct struct {
 
 var rootSession *mgo.Session
 
-// NewMongoDBRootSession 定义
-func NewMongoDBRootSession(url string) (err error) {
+// NewMongoRootSession 定义
+func NewMongoRootSession(url string) (err error) {
 	if rootSession == nil {
 		rootSession, err = mgo.Dial(url)
 	}
 	return err
 }
 
-// NewMongoDBSessionStruct 定义
-func NewMongoDBSessionStruct() (mongo *MongoDBSessionStruct, err error) {
-	mongo = &MongoDBSessionStruct{}
+// NewMongoSessionStruct 定义
+func NewMongoSessionStruct() (mongo *MongoSessionStruct, err error) {
+	mongo = &MongoSessionStruct{}
 	mongo.session = rootSession.Copy()
 	return mongo, nil
 }
 
 // CloseSession 定义
-func (mongo *MongoDBSessionStruct) CloseSession() error {
+func (mongo *MongoSessionStruct) CloseSession() error {
 	if mongo == nil {
-		return errors.New("MongoDBSessionStruct类型空指针错误。")
+		return errors.New("MongoSessionStruct类型空指针错误。")
 	}
 	if mongo.session == nil {
 		return errors.New("Session类型空指针错误。")
@@ -48,9 +48,9 @@ func (mongo *MongoDBSessionStruct) CloseSession() error {
 }
 
 // UseDB 定义
-func (mongo *MongoDBSessionStruct) UseDB(dbName string) error {
+func (mongo *MongoSessionStruct) UseDB(dbName string) error {
 	if mongo == nil {
-		return errors.New("MongoDBSessionStruct类型空指针错误。")
+		return errors.New("MongoSessionStruct类型空指针错误。")
 	}
 	if mongo.session == nil {
 		return errors.New("Session类型空指针错误。")
@@ -62,9 +62,9 @@ func (mongo *MongoDBSessionStruct) UseDB(dbName string) error {
 }
 
 // UseCollection 定义
-func (mongo *MongoDBSessionStruct) UseCollection(collectionName string) error {
+func (mongo *MongoSessionStruct) UseCollection(collectionName string) error {
 	if mongo == nil {
-		return errors.New("MongoDBSessionStruct类型空指针错误。")
+		return errors.New("MongoSessionStruct类型空指针错误。")
 	}
 	if mongo.session == nil {
 		return errors.New("Session类型空指针错误。")
