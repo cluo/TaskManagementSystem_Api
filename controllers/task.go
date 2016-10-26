@@ -3,6 +3,7 @@ package controllers
 import (
 	"TaskManagementSystem_Api/models"
 	"encoding/json"
+	"log"
 
 	"github.com/astaxie/beego"
 )
@@ -31,6 +32,9 @@ func (u *TaskController) Post() {
 // @Success 200 {object} models.Task
 // @router / [get]
 func (u *TaskController) GetAll() {
+	log.Println("---------------------------------------------------")
+	log.Println("get all")
+	log.Println("---------------------------------------------------")
 	tasks := models.GetAllTasks()
 	u.Data["json"] = tasks
 	u.ServeJSON()

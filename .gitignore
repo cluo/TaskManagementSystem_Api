@@ -5,3 +5,6 @@
 
 
 /routers/commentsRouter_*.go
+
+/swagger
+/swagger.zip
