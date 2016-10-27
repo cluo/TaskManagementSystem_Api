@@ -1,56 +1,66 @@
 package types
 
+import (
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
+)
+
 type TaskHeader struct {
-	id                string
-	name              string
-	resume            string
-	planningBeginDate string
-	planningEndDate   string
-	realBeginDate     string
-	realEndDate       string
-	status            string
-	primaryExecutorId string
-	primaryExecutor   string
+	ID                      string        `bson:"id" json:"id"`
+	Name                    string        `bson:"name" json:"name"`
+	Resume                  string        `bson:"resume" json:"resume"`
+	PlanningBeginDate       time.Time     `bson:"planningBeginDate" json:"planningBeginDate"`
+	PlanningEndDate         time.Time     `bson:"planningEndDate" json:"planningEndDate"`
+	RealBeginDate           time.Time     `bson:"realBeginDate" json:"realBeginDate"`
+	RealEndDate             time.Time     `bson:"realEndDate" json:"realEndDate"`
+	Status                  string        `bson:"status" json:"status"`
+	PrimaryExecutorObjectID bson.ObjectId `bson:"primaryExecutorObjectId" json:"primaryExecutorObjectId"`
+	PrimaryExecutor         string        `bson:"primaryExecutor" json:"primaryExecutor"`
 }
 
 type Task struct {
-	Id       string
-	Taskname string
-	Password string
+	ID     string `bson:"id" json:"id"`
+	Name   string `bson:"name" json:"name"`
+	Resume string `bson:"resume" json:"resume"`
+
+	Description     string        `bson:"description" json:"description"`
+	CustomerContact string        `bson:"customerContact" json:"customerContact"`
+	CreatedTime     time.Time     `bson:"createdTime" json:"createdTime"`
+	CreatorObjectID bson.ObjectId `bson:"creatorObjectId" json:"creatorObjectId"`
+	Creator         string        `bson:"creator" json:"creator"`
+
+	PrimarySellerObjectID bson.ObjectId `bson:"primarySellerObjectId" json:"primarySellerObjectId"`
+	PrimarySeller         string        `bson:"primarySeller" json:"primarySeller"`
+
+	PrimaryOCObjectID       bson.ObjectId   `bson:"primaryOCObjectId" json:"primaryOCObjectId"`
+	PrimaryOC               string          `bson:"primaryOC" json:"primaryOC"`
+	PrimaryExecutorObjectID bson.ObjectId   `bson:"primaryExecutorObjectId" json:"primaryExecutorObjectId"`
+	PrimaryExecutor         string          `bson:"primaryExecutor" json:"primaryExecutor"`
+	OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds" json:"otherExecutorObjectIds"`
+	OtherExecutors          []string        `bson:"otherExecutors" json:"otherExecutors"`
+
+	RequiringBeginDate    time.Time     `bson:"requiringBeginDate" json:"requiringBeginDate"`
+	RequiringEndDate      time.Time     `bson:"requiringEndDate" json:"requiringEndDate"`
+	PlanningBeginDate     time.Time     `bson:"planningBeginDate" json:"planningBeginDate"`
+	PlanningEndDate       time.Time     `bson:"planningEndDate" json:"planningEndDate"`
+	RealBeginDate         time.Time     `bson:"realBeginDate" json:"realBeginDate"`
+	RealEndDate           time.Time     `bson:"realEndDate" json:"realEndDate"`
+	Percent               int           `bson:"percent" json:"percent"`
+	Status                string        `bson:"status" json:"status"`
+	ParentProductObjectID bson.ObjectId `bson:"parentProductObjectId" json:"parentProductObjectId"`
+	ParentProduct         string        `bson:"parentProduct" json:"parentProduct"`
+	ParentProjectObjectID bson.ObjectId `bson:"parentProjectObjectId" json:"parentProjectObjectId"`
+	ParentProject         string        `bson:"parentProject" json:"parentProject"`
 }
 
-// {
-//     "_id" : ObjectId("580e02fdacfecf773c1ec350"),
-//     "id" : "T201606120001",
-//     "name" : "任务管理系统开发",
-//     "resume" : "公安信息化产品中心任务管理系统开发",
-//     "description" : "公安信息化产品中心任务管理系统开发，公安信息化产品中心任务管理系统开发，公安信息化产品中心任务管理系统开发。",
-//     "customerContact" : "客户1 电话：13810138000",
-//     "creatorId" : "000552",
-//     "creatorObjectId" : ObjectId("580dec5bacfecf773c1ec327"),
-//     "createdTime" : ISODate("2016-09-10T00:00:00.000Z"),
-//     "primarySellerId" : "000186",
-//     "primarySellerObjectId" : ObjectId("580df929acfecf773c1ec32f"),
-//     "primaryOCId" : "000155",
-//     "primaryOCObjectId" : ObjectId("580dee82acfecf773c1ec32d"),
-//     "primaryExecutorId" : "000169",
-//     "primaryExecutorObjectId" : ObjectId("580decd1acfecf773c1ec32a"),
-//     "otherExecutorIds" : [
-//         "000019",
-//         "000800"
-//     ],
-//     "otherExecutorObjectIds" : [
-//         ObjectId("580dec5bacfecf773c1ec328"),
-//         ObjectId("580dfc4eacfecf773c1ec33a")
-//     ],
-//     "requiringBeginDate" : ISODate("2016-09-20T00:00:00.000Z"),
-//     "requiringEndDate" : ISODate("2016-10-20T00:00:00.000Z"),
-//     "planningBeginDate" : ISODate("2016-09-20T00:00:00.000Z"),
-//     "planningEndDate" : ISODate("2016-10-20T00:00:00.000Z"),
-//     "realBeginDate" : ISODate("2016-09-20T00:00:00.000Z"),
-//     "realEndDate" : ISODate("2016-10-20T00:00:00.000Z"),
-//     "percent" : 100,
-//     "status" : "完成",
-//     "parentProduct" : null,
-//     "parentProject" : null
-// }
+type EmployeeName struct {
+	Name string `bson:"name"`
+}
+
+type ProductName struct {
+	Name string `bson:"name"`
+}
+type ProjectName struct {
+	Name string `bson:"name"`
+}

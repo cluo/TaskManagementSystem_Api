@@ -10,7 +10,7 @@ import (
 // Operations about Tasks
 type TaskController struct {
 	beego.Controller
-	task types.TaskHeader
+	task12312 types.TaskHeader
 }
 
 // @Title CreateTask
@@ -20,7 +20,7 @@ type TaskController struct {
 // @Failure 403 body is empty
 // @router / [post]
 func (u *TaskController) Post() {
-	// var task models.Task
+	// var task types.Task
 	// json.Unmarshal(u.Ctx.Input.RequestBody, &task)
 	// uid := models.AddTask(task)
 	// u.Data["json"] = map[string]string{"uid": uid}
@@ -48,16 +48,16 @@ func (u *TaskController) GetAll() {
 // @Failure 403 :uid is empty
 // @router /:uid [get]
 func (u *TaskController) Get() {
-	// uid := u.GetString(":uid")
-	// if uid != "" {
-	// 	task, err := models.GetTask(uid)
-	// 	if err != nil {
-	// 		u.Data["json"] = err.Error()
-	// 	} else {
-	// 		u.Data["json"] = task
-	// 	}
-	// }
-	// u.ServeJSON()
+	uid := u.GetString(":uid")
+	if uid != "" {
+		task, err := models.GetTask(uid)
+		if err != nil {
+			u.Data["json"] = err.Error()
+		} else {
+			u.Data["json"] = task
+		}
+	}
+	u.ServeJSON()
 }
 
 // @Title Update

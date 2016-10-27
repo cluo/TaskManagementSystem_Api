@@ -10,9 +10,9 @@ import (
 
 // MongoSessionStruct 定义
 type MongoSessionStruct struct {
-	session    *mgo.Session
-	db         *mgo.Database
-	collection *mgo.Collection
+	Session    *mgo.Session
+	Db         *mgo.Database
+	Collection *mgo.Collection
 }
 
 var rootSession *mgo.Session
@@ -27,7 +27,7 @@ func GetMongoSession() (mongo *MongoSessionStruct, err error) {
 		}
 	}
 	mongo = &MongoSessionStruct{}
-	mongo.session = rootSession.Copy()
+	mongo.Session = rootSession.Copy()
 	return mongo, nil
 }
 
@@ -36,14 +36,14 @@ func (mongo *MongoSessionStruct) CloseSession() error {
 	if mongo == nil {
 		return errors.New("MongoSessionStruct类型空指针错误。")
 	}
-	if mongo.session == nil {
+	if mongo.Session == nil {
 		return errors.New("Session类型空指针错误。")
 	}
-	mongo.collection = nil
-	mongo.db = nil
+	mongo.Collection = nil
+	mongo.Db = nil
 
-	mongo.session.Close()
-	mongo.session = nil
+	mongo.Session.Close()
+	mongo.Session = nil
 
 	return nil
 }
@@ -53,11 +53,11 @@ func (mongo *MongoSessionStruct) UseDB(dbName string) error {
 	if mongo == nil {
 		return errors.New("MongoSessionStruct类型空指针错误。")
 	}
-	if mongo.session == nil {
+	if mongo.Session == nil {
 		return errors.New("Session类型空指针错误。")
 	}
-	mongo.db = mongo.session.DB(dbName)
-	mongo.collection = nil
+	mongo.Db = mongo.Session.DB(dbName)
+	mongo.Collection = nil
 
 	return nil
 }
@@ -67,13 +67,13 @@ func (mongo *MongoSessionStruct) UseCollection(collectionName string) error {
 	if mongo == nil {
 		return errors.New("MongoSessionStruct类型空指针错误。")
 	}
-	if mongo.session == nil {
+	if mongo.Session == nil {
 		return errors.New("Session类型空指针错误。")
 	}
-	if mongo.db == nil {
+	if mongo.Db == nil {
 		return errors.New("Database类型空指针错误。")
 	}
-	mongo.collection = mongo.db.C(collectionName)
+	mongo.Collection = mongo.Db.C(collectionName)
 
 	return nil
 }

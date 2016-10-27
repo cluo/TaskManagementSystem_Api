@@ -30,6 +30,11 @@ func init() {
 				&controllers.TaskController{},
 			),
 		),
+		beego.NSNamespace("/communication",
+			beego.NSInclude(
+				&controllers.CommunicationController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
