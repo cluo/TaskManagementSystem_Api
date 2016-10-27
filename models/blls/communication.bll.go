@@ -8,7 +8,7 @@ import (
 type CommunicationBLL struct {
 }
 
-func (bll CommunicationBLL) GetCommunications(id string) (c []*types.Communication, err error) {
+func (bll CommunicationBLL) GetCommunications(id string) (c map[string][]*types.Communication, err error) {
 	c, err = (&dals.CommunicationDAL{}).GetCommunications(id)
 	return
 }

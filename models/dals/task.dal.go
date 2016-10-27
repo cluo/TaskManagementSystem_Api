@@ -11,7 +11,7 @@ type TaskDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (t *TaskDAL) GetAllTaskHeaders() (taskList []*types.TaskHeader, err error) {
+func (t *TaskDAL) GetAllTaskHeaders() (taskList map[string][]*types.TaskHeader, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -22,19 +22,19 @@ func (t *TaskDAL) GetAllTaskHeaders() (taskList []*types.TaskHeader, err error) 
 	if err != nil {
 		return
 	}
-
+	taskList = make(map[string][]*types.TaskHeader)
 	task := new(types.TaskHeader)
-	taskList = make([]*types.TaskHeader, 0, 10)
+	taskList["data"] = make([]*types.TaskHeader, 0, 10)
 
 	iter := t.mongo.Collection.Find(nil).Iter()
 	for iter.Next(&task) {
 		// taskList[task.ID] = task
-		taskList = append(taskList, task)
+		taskList["data"] = append(taskList["data"], task)
 		task = new(types.TaskHeader)
 	}
 
 	// 获取人员姓名
-	for _, value := range taskList {
+	for _, value := range taskList["data"] {
 		emp := new(types.EmployeeName)
 		err1 := t.mongo.Db.C("M_Employees").FindId(value.PrimaryExecutorObjectID).One(&emp)
 		if err1 == nil {
@@ -43,7 +43,7 @@ func (t *TaskDAL) GetAllTaskHeaders() (taskList []*types.TaskHeader, err error) 
 	}
 	return
 }
-func (t *TaskDAL) GetTaskDetail(id string) (task types.Task, err error) {
+func (t *TaskDAL) GetTaskDetail(id string) (task map[string]*types.Task, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -55,48 +55,50 @@ func (t *TaskDAL) GetTaskDetail(id string) (task types.Task, err error) {
 		return
 	}
 
-	t.mongo.Collection.Find(bson.M{"id": id}).One(&task)
+	task = make(map[string]*types.Task)
+	task["data"] = new(types.Task)
+	t.mongo.Collection.Find(bson.M{"id": id}).One(task["data"])
 
 	// 获取人员姓名
 	emp := new(types.EmployeeName)
-	err1 := t.mongo.Db.C("M_Employees").FindId(task.PrimaryExecutorObjectID).One(&emp)
+	err1 := t.mongo.Db.C("M_Employees").FindId(task["data"].PrimaryExecutorObjectID).One(&emp)
 	if err1 == nil {
-		task.PrimaryExecutor = emp.Name
+		task["data"].PrimaryExecutor = emp.Name
 	}
 	emp = new(types.EmployeeName)
-	err1 = t.mongo.Db.C("M_Employees").FindId(task.CreatorObjectID).One(&emp)
+	err1 = t.mongo.Db.C("M_Employees").FindId(task["data"].CreatorObjectID).One(&emp)
 	if err1 == nil {
-		task.Creator = emp.Name
+		task["data"].Creator = emp.Name
 	}
 	emp = new(types.EmployeeName)
-	err1 = t.mongo.Db.C("M_Employees").FindId(task.PrimarySellerObjectID).One(&emp)
+	err1 = t.mongo.Db.C("M_Employees").FindId(task["data"].PrimarySellerObjectID).One(&emp)
 	if err1 == nil {
-		task.PrimarySeller = emp.Name
+		task["data"].PrimarySeller = emp.Name
 	}
 	emp = new(types.EmployeeName)
-	err1 = t.mongo.Db.C("M_Employees").FindId(task.PrimaryOCObjectID).One(&emp)
+	err1 = t.mongo.Db.C("M_Employees").FindId(task["data"].PrimaryOCObjectID).One(&emp)
 	if err1 == nil {
-		task.PrimaryOC = emp.Name
+		task["data"].PrimaryOC = emp.Name
 	}
-	otherExecutorsCount := len(task.OtherExecutorObjectIds)
-	task.OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
-	for index, value := range task.OtherExecutorObjectIds {
+	otherExecutorsCount := len(task["data"].OtherExecutorObjectIds)
+	task["data"].OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
+	for index, value := range task["data"].OtherExecutorObjectIds {
 		emp = new(types.EmployeeName)
 		err1 = t.mongo.Db.C("M_Employees").FindId(value).One(&emp)
 		if err1 == nil {
-			task.OtherExecutors[index] = emp.Name
+			task["data"].OtherExecutors[index] = emp.Name
 		}
 	}
 
 	product := new(types.ProductName)
-	err1 = t.mongo.Db.C("T_Products").FindId(task.ParentProductObjectID).One(&emp)
+	err1 = t.mongo.Db.C("T_Products").FindId(task["data"].ParentProductObjectID).One(&emp)
 	if err1 == nil {
-		task.ParentProduct = product.Name
+		task["data"].ParentProduct = product.Name
 	}
 	project := new(types.ProjectName)
-	err1 = t.mongo.Db.C("T_Projects").FindId(task.ParentProjectObjectID).One(&emp)
+	err1 = t.mongo.Db.C("T_Projects").FindId(task["data"].ParentProjectObjectID).One(&emp)
 	if err1 == nil {
-		task.ParentProject = project.Name
+		task["data"].ParentProject = project.Name
 	}
 	return
 }
