@@ -10,12 +10,12 @@ import (
 // Operations about Tasks
 type TaskController struct {
 	beego.Controller
-	task types.Task
+	task types.TaskHeader
 }
 
 // @Title CreateTask
 // @Description create tasks
-// @Param	body		body 	models.Task	true		"body for task content"
+// @Param	body		body 	types.Task	true		"body for task content"
 // @Success 200 {int} models.Task.Id
 // @Failure 403 body is empty
 // @router / [post]
@@ -29,7 +29,7 @@ func (u *TaskController) Post() {
 
 // @Title GetAll
 // @Description get all Tasks (Header)
-// @Success 200 {object} types.Task
+// @Success 200 {object} types.TaskHeader
 // @router / [get]
 func (u *TaskController) GetAll() {
 	tasks, err := models.GetAllTasks()
@@ -44,7 +44,7 @@ func (u *TaskController) GetAll() {
 // @Title Get
 // @Description get task by uid
 // @Param	uid		path 	string	true		"The key for staticblock"
-// @Success 200 {object} models.Task
+// @Success 200 {object} types.Task
 // @Failure 403 :uid is empty
 // @router /:uid [get]
 func (u *TaskController) Get() {
@@ -63,7 +63,7 @@ func (u *TaskController) Get() {
 // @Title Update
 // @Description update the task
 // @Param	uid		path 	string	true		"The uid you want to update"
-// @Param	body		body 	models.Task	true		"body for task content"
+// @Param	body		body 	types.Task	true		"body for task content"
 // @Success 200 {object} models.Task
 // @Failure 403 :uid is not int
 // @router /:uid [put]
