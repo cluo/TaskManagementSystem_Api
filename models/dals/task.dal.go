@@ -1,25 +1,18 @@
-package models
+package dals
 
-import (
-	"TaskManagementSystem_Api/models"
-	"errors"
-	"strconv"
-	"time"
-	"github.com/astaxie/beego"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-)
+import "TaskManagementSystem_Api/models/common"
 
 type TaskDAL struct {
-    mongo *MongoSessionStruct;
+	mongo *common.MongoSessionStruct
 }
 
-func (t *TaskDAL) GetAllTasks() (err error){
-    t.mongo,err = GetMongoSession()
-    if err != nil {
-        return err;
-    }
-    defer t.mongo.CloseSession();
+func (t *TaskDAL) GetAllTasks() (err error) {
+	t.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return err
+	}
+	defer t.mongo.CloseSession()
+	return nil
 }
 
 // {
@@ -38,12 +31,12 @@ func (t *TaskDAL) GetAllTasks() (err error){
 //     "primaryOCObjectId" : ObjectId("580dee82acfecf773c1ec32d"),
 //     "primaryExecutorId" : "000169",
 //     "primaryExecutorObjectId" : ObjectId("580decd1acfecf773c1ec32a"),
-//     "otherExecutorIds" : [ 
-//         "000019", 
+//     "otherExecutorIds" : [
+//         "000019",
 //         "000800"
 //     ],
-//     "otherExecutorObjectIds" : [ 
-//         ObjectId("580dec5bacfecf773c1ec328"), 
+//     "otherExecutorObjectIds" : [
+//         ObjectId("580dec5bacfecf773c1ec328"),
 //         ObjectId("580dfc4eacfecf773c1ec33a")
 //     ],
 //     "requiringBeginDate" : ISODate("2016-09-20T00:00:00.000Z"),

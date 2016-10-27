@@ -1,6 +1,8 @@
 package models
 
 import (
+	"TaskManagementSystem_Api/models/blls"
+	"TaskManagementSystem_Api/models/types"
 	"errors"
 	"strconv"
 	"time"
@@ -36,8 +38,8 @@ func GetTask(uid string) (u *Task, err error) {
 	return nil, errors.New("Task not exists")
 }
 
-func GetAllTasks() map[string]*Task {
-	return TaskList
+func GetAllTasks() (u map[string]*types.Task, err error) {
+	return (&blls.TaskBLL{}).GetAllTasks()
 }
 
 func UpdateTask(uid string, uu *Task) (a *Task, err error) {
