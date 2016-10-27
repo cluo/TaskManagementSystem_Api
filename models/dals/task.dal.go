@@ -1,18 +1,21 @@
 package dals
 
-import "TaskManagementSystem_Api/models/common"
+import (
+	"TaskManagementSystem_Api/models/common"
+	"TaskManagementSystem_Api/models/types"
+)
 
 type TaskDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (t *TaskDAL) GetAllTasks() (err error) {
+func (t *TaskDAL) GetHeaderOfAllTasks() (u map[string]*types.Task, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer t.mongo.CloseSession()
-	return nil
+	return nil, nil
 }
 
 // {

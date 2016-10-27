@@ -6,9 +6,8 @@ import (
 )
 
 type TaskBLL struct {
-	dal dals.TaskDAL
 }
 
 func (bll TaskBLL) GetAllTasks() (u map[string]*types.Task, err error) {
-	return nil, nil
+	return (&dals.TaskDAL{}).GetHeaderOfAllTasks()
 }
