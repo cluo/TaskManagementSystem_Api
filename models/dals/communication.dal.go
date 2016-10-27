@@ -3,7 +3,6 @@ package dals
 import (
 	"TaskManagementSystem_Api/models/common"
 	"TaskManagementSystem_Api/models/types"
-	"strconv"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -12,7 +11,7 @@ type CommunicationDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (t *CommunicationDAL) GetCommunications(id string) (communications map[string]*types.Communication, err error) {
+func (t *CommunicationDAL) GetCommunications(id string) (communications []*types.Communication, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -25,14 +24,12 @@ func (t *CommunicationDAL) GetCommunications(id string) (communications map[stri
 	}
 
 	communication := new(types.Communication)
-	communications = make(map[string]*types.Communication)
+	communications = make([]*types.Communication, 0, 10)
 
 	iter := t.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").Iter()
-	index := 0
 	for iter.Next(&communication) {
-		communications[strconv.Itoa(index)] = communication
+		communications = append(communications, communication)
 		communication = new(types.Communication)
-		index++
 	}
 
 	// 获取人员姓名

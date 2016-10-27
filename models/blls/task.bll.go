@@ -8,7 +8,7 @@ import (
 type TaskBLL struct {
 }
 
-func (bll TaskBLL) GetAllTasks() (t map[string]*types.TaskHeader, err error) {
+func (bll TaskBLL) GetAllTasks() (t []*types.TaskHeader, err error) {
 	t, err = (&dals.TaskDAL{}).GetAllTaskHeaders()
 	return
 }

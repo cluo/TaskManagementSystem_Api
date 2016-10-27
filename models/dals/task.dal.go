@@ -11,7 +11,7 @@ type TaskDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (t *TaskDAL) GetAllTaskHeaders() (taskList map[string]*types.TaskHeader, err error) {
+func (t *TaskDAL) GetAllTaskHeaders() (taskList []*types.TaskHeader, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -24,11 +24,12 @@ func (t *TaskDAL) GetAllTaskHeaders() (taskList map[string]*types.TaskHeader, er
 	}
 
 	task := new(types.TaskHeader)
-	taskList = make(map[string]*types.TaskHeader)
+	taskList = make([]*types.TaskHeader, 0, 10)
 
 	iter := t.mongo.Collection.Find(nil).Iter()
 	for iter.Next(&task) {
-		taskList[task.ID] = task
+		// taskList[task.ID] = task
+		taskList = append(taskList, task)
 		task = new(types.TaskHeader)
 	}
 

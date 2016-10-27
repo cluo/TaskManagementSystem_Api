@@ -5,7 +5,7 @@ import (
 	"TaskManagementSystem_Api/models/types"
 )
 
-func GetAllTasks() (t map[string]*types.TaskHeader, err error) {
+func GetAllTasks() (t []*types.TaskHeader, err error) {
 	t, err = (&blls.TaskBLL{}).GetAllTasks()
 	return
 }
