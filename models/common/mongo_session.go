@@ -3,6 +3,8 @@ package models
 import (
 	"errors"
 
+	"github.com/astaxie/beego"
+
 	"gopkg.in/mgo.v2"
 )
 
@@ -15,16 +17,15 @@ type MongoSessionStruct struct {
 
 var rootSession *mgo.Session
 
-// NewMongoRootSession 定义
-func NewMongoRootSession(url string) (err error) {
+// GetMongoSession 定义
+func GetMongoSession() (mongo *MongoSessionStruct, err error) {
 	if rootSession == nil {
-		rootSession, err = mgo.Dial(url)
+		dbURL := beego.AppConfig.String("mongo")
+		rootSession, err = mgo.Dial(dbURL)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return err
-}
-
-// NewMongoSessionStruct 定义
-func NewMongoSessionStruct() (mongo *MongoSessionStruct, err error) {
 	mongo = &MongoSessionStruct{}
 	mongo.session = rootSession.Copy()
 	return mongo, nil
