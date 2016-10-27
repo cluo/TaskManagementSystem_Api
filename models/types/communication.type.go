@@ -15,3 +15,7 @@ type Communication struct {
 	SentTime         time.Time     `bson:"sentTime" json:"sentTime"`
 	Content          string        `bson:"content" json:"content"`
 }
+
+type ObjectID struct {
+	Oid bson.ObjectId `bson:"_id"`
+}

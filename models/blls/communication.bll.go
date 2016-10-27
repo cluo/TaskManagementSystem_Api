@@ -12,3 +12,8 @@ func (bll CommunicationBLL) GetCommunications(id string) (c map[string][]*types.
 	c, err = (&dals.CommunicationDAL{}).GetCommunications(id)
 	return
 }
+
+func (bll CommunicationBLL) AddCommunication(c types.Communication) (s map[string]map[string]string, err error) {
+	s, err = (&dals.CommunicationDAL{}).AddCommunication(c)
+	return
+}

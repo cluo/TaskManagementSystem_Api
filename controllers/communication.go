@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"TaskManagementSystem_Api/models"
+	"TaskManagementSystem_Api/models/types"
+	"encoding/json"
 
 	"github.com/astaxie/beego"
 )
@@ -18,11 +20,15 @@ type CommunicationController struct {
 // @Failure 403 body is empty
 // @router / [post]
 func (u *CommunicationController) Post() {
-	// var communication types.Communication
-	// json.Unmarshal(u.Ctx.Input.RequestBody, &communication)
-	// uid := models.AddCommunication(communication)
-	// u.Data["json"] = map[string]string{"uid": uid}
-	// u.ServeJSON()
+	var communication types.Communication
+	json.Unmarshal(u.Ctx.Input.RequestBody, &communication)
+	data, err := models.AddCommunication(communication)
+	if err != nil {
+		u.Data["json"] = err.Error()
+	} else {
+		u.Data["json"] = data
+	}
+	u.ServeJSON()
 }
 
 // @Title Get
