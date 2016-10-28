@@ -11,7 +11,7 @@ type Communication struct {
 	RelevantObjectID bson.ObjectId `bson:"relevantObjectId" json:"relevantObjectId"`
 	PersonID         string        `bson:"personId" json:"personId"`
 	PersonObjectID   bson.ObjectId `bson:"personObjectId" json:"personObjectId"`
-	PersonName       string        `bson:"personName" json:"personName"`
+	PersonName       string        `json:"personName"`
 	SentTime         time.Time     `bson:"sentTime" json:"sentTime"`
 	Content          string        `bson:"content" json:"content"`
 }

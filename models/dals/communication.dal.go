@@ -4,7 +4,7 @@ import (
 	"TaskManagementSystem_Api/models/common"
 	"TaskManagementSystem_Api/models/types"
 
-	"log"
+	"errors"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -53,35 +53,28 @@ func (c *CommunicationDAL) AddCommunication(communication types.Communication) (
 	}
 	defer c.mongo.CloseSession()
 	c.mongo.UseDB("local")
-	log.Println("----------------------1-----------------------")
 	objectID := new(types.ObjectID)
 	err = c.mongo.Db.C("T_Tasks").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	log.Println(objectID.Oid)
-	log.Println("----------------------2-----------------------")
 	err = c.mongo.Db.C("T_Project").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	log.Println(objectID.Oid)
-	log.Println("----------------------3-----------------------")
 	err = c.mongo.Db.C("T_Product").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	communication.RelevantObjectID = objectID.Oid
+	if bson.ObjectId.Valid(objectID.Oid) {
+		communication.RelevantObjectID = objectID.Oid
+	} else {
+		err = errors.New("RelevantID无效。")
+	}
 
-	log.Println(objectID.Oid)
-	log.Println("----------------------4-----------------------")
 	objectID = new(types.ObjectID)
 	err = c.mongo.Db.C("M_Employees").Find(bson.M{"empId": communication.PersonID}).One(&objectID)
 	communication.PersonObjectID = objectID.Oid
 
-	log.Println(objectID.Oid)
-	log.Println("----------------------5-----------------------")
 	err = c.mongo.UseCollection("T_Communications")
 	if err != nil {
 		return
 	}
-	log.Println("----------------------6-----------------------")
 	err = c.mongo.Collection.Insert(communication)
 	if err != nil {
 		return
 	}
-	log.Println("----------------------7-----------------------")
 	s = make(map[string]map[string]string)
 	s["data"] = make(map[string]string)
 	s["data"]["relevantId"] = communication.RelevantID
