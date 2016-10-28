@@ -13,14 +13,14 @@ type CommunicationController struct {
 	beego.Controller
 }
 
-// @Title CreateCommunication
+// @Title AddCommunication
 // @Description create communications
-// @Param	body		body 	types.communication	true		"body for communication content"
+// @Param	body		body 	types.Communication_Post	true		"body for communication content"
 // @Success 200 {string} types.communication.RelevantID
 // @Failure 403 body is empty
 // @router / [post]
 func (u *CommunicationController) Post() {
-	var communication types.Communication
+	var communication types.Communication_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &communication)
 	data, err := models.AddCommunication(communication)
 	if err != nil {

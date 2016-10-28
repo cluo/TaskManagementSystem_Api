@@ -46,7 +46,7 @@ func (c *CommunicationDAL) GetCommunications(id string) (communications map[stri
 	return
 }
 
-func (c *CommunicationDAL) AddCommunication(communication types.Communication) (s map[string]map[string]string, err error) {
+func (c *CommunicationDAL) AddCommunication(communication types.Communication_Post) (s map[string]map[string]string, err error) {
 	c.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
