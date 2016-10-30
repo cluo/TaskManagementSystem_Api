@@ -14,3 +14,8 @@ func GetTask(id string) (t map[string]*types.Task_Get, err error) {
 	t, err = (&blls.TaskBLL{}).GetTaskDetail(id)
 	return
 }
+
+func AddTask(taskPost types.Task_Post) (s map[string]map[string]string, err error) {
+	s, err = (&blls.TaskBLL{}).AddTask(taskPost)
+	return
+}

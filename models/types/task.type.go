@@ -61,6 +61,9 @@ type ProductName struct {
 type ProjectName struct {
 	Name *string `bson:"name"`
 }
+type MaxID struct {
+	ID *string `bson:"id"`
+}
 
 type TaskHeader_Get struct {
 	ID                *string    `json:"id"`

@@ -3,6 +3,7 @@ package controllers
 import (
 	"TaskManagementSystem_Api/models"
 	"TaskManagementSystem_Api/models/types"
+	"encoding/json"
 
 	"github.com/astaxie/beego"
 )
@@ -15,16 +16,20 @@ type TaskController struct {
 
 // @Title CreateTask
 // @Description create tasks
-// @Param	body		body 	types.Task	true		"body for task content"
+// @Param	body		body 	types.Task_Post	true		"body for task content"
 // @Success 200 {int} models.Task.Id
 // @Failure 403 body is empty
 // @router / [post]
 func (u *TaskController) Post() {
-	// var task types.Task
-	// json.Unmarshal(u.Ctx.Input.RequestBody, &task)
-	// uid := models.AddTask(task)
-	// u.Data["json"] = map[string]string{"uid": uid}
-	// u.ServeJSON()
+	var task types.Task_Post
+	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
+	data, err := models.AddTask(task)
+	if err != nil {
+		u.Data["json"] = err.Error()
+	} else {
+		u.Data["json"] = data
+	}
+	u.ServeJSON()
 }
 
 // @Title GetAll

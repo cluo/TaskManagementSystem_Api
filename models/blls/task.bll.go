@@ -17,3 +17,7 @@ func (bll TaskBLL) GetTaskDetail(id string) (t map[string]*types.Task_Get, err e
 	t, err = (&dals.TaskDAL{}).GetTaskDetail(id)
 	return
 }
+func (bll TaskBLL) AddTask(taskPost types.Task_Post) (s map[string]map[string]string, err error) {
+	s, err = (&dals.TaskDAL{}).AddTask(taskPost)
+	return
+}
