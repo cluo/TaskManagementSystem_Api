@@ -8,12 +8,12 @@ import (
 type CommunicationBLL struct {
 }
 
-func (bll CommunicationBLL) GetCommunications(id string) (c map[string][]*types.Communication, err error) {
+func (bll CommunicationBLL) GetCommunications(id string) (c map[string][]*types.Communication_Get, err error) {
 	c, err = (&dals.CommunicationDAL{}).GetCommunications(id)
 	return
 }
 
-func (bll CommunicationBLL) AddCommunication(c types.Communication_Insert) (s map[string]map[string]string, err error) {
+func (bll CommunicationBLL) AddCommunication(c types.Communication_Post) (s map[string]map[string]string, err error) {
 	s, err = (&dals.CommunicationDAL{}).AddCommunication(c)
 	return
 }

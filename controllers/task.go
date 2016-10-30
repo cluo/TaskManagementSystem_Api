@@ -29,7 +29,7 @@ func (u *TaskController) Post() {
 
 // @Title GetAll
 // @Description get all Tasks (Header)
-// @Success 200 {object} types.TaskHeader
+// @Success 200 {object} types.TaskHeader_Get
 // @router / [get]
 func (u *TaskController) GetAll() {
 	tasks, err := models.GetAllTasks()
@@ -44,7 +44,7 @@ func (u *TaskController) GetAll() {
 // @Title Get
 // @Description get task by uid
 // @Param	uid		path 	string	true		"The key for staticblock"
-// @Success 200 {object} types.Task
+// @Success 200 {object} types.Task_Get
 // @Failure 403 :uid is empty
 // @router /:uid [get]
 func (u *TaskController) Get() {

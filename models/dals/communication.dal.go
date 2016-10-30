@@ -13,7 +13,7 @@ type CommunicationDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (c *CommunicationDAL) GetCommunications(id string) (communications map[string][]*types.Communication, err error) {
+func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet map[string][]*types.Communication_Get, err error) {
 	c.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -25,33 +25,52 @@ func (c *CommunicationDAL) GetCommunications(id string) (communications map[stri
 		return
 	}
 
-	communications = make(map[string][]*types.Communication)
-	communication := new(types.Communication)
-	communications["data"] = make([]*types.Communication, 0, 10)
+	communicationsGet = make(map[string][]*types.Communication_Get)
 
-	iter := c.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").Iter()
-	for iter.Next(&communication) {
-		communications["data"] = append(communications["data"], communication)
-		communication = new(types.Communication)
-	}
-
-	// 获取人员姓名
-	for _, value := range communications["data"] {
+	var communications []*types.Communication
+	c.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").All(&communications)
+	communicationCount := len(communications)
+	communicationsGet["data"] = make([]*types.Communication_Get, communicationCount, communicationCount)
+	for index, value := range communications {
+		communicationGet := new(types.Communication_Get)
+		common.StructDeepCopy(value, communicationGet)
+		// 获取人员姓名
 		emp := new(types.EmployeeName)
 		err1 := c.mongo.Db.C("M_Employees").FindId(value.PersonObjectID).One(&emp)
 		if err1 == nil {
-			value.PersonName = emp.Name
+			communicationGet.PersonName = emp.Name
 		}
+		communicationsGet["data"][index] = communicationGet
 	}
+	// communications = make(map[string][]*types.Communication_Get)
+	// communication := new(types.Communication)
+	// communicationGet := new(types.Communication_Get)
+	// communications["data"] = make([]*types.Communication_Get, 0, 10)
+
+	// iter := c.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").Iter()
+	// for iter.Next(&communication) {
+	// 	common.StructDeepCopy(communication, communicationGet)
+	// 	emp := new(types.EmployeeName)
+	// 	err1 := c.mongo.Db.C("M_Employees").FindId(communication.PersonObjectID).One(&emp)
+	// 	if err1 == nil {
+	// 		communicationGet.PersonName = emp.Name
+	// 	}
+	// 	communications["data"] = append(communications["data"], communicationGet)
+	// 	communication = new(types.Communication)
+	// 	communicationGet = new(types.Communication_Get)
+	// }
 	return
 }
 
-func (c *CommunicationDAL) AddCommunication(communication types.Communication_Insert) (s map[string]map[string]string, err error) {
+func (c *CommunicationDAL) AddCommunication(communicationPost types.Communication_Post) (s map[string]map[string]string, err error) {
 	c.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
 	}
 	defer c.mongo.CloseSession()
+	communication := new(types.Communication)
+	common.StructDeepCopy(communicationPost, communication)
+	communication.OID = bson.NewObjectId()
 	c.mongo.UseDB("local")
 	objectID := new(types.ObjectID)
 	err = c.mongo.Db.C("T_Tasks").Find(bson.M{"id": communication.RelevantID}).One(&objectID)

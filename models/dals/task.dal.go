@@ -11,7 +11,7 @@ type TaskDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (t *TaskDAL) GetAllTaskHeaders() (taskList map[string][]*types.TaskHeader, err error) {
+func (t *TaskDAL) GetAllTaskHeaders() (taskGetList map[string][]*types.TaskHeader_Get, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -22,28 +22,27 @@ func (t *TaskDAL) GetAllTaskHeaders() (taskList map[string][]*types.TaskHeader, 
 	if err != nil {
 		return
 	}
-	taskList = make(map[string][]*types.TaskHeader)
-	task := new(types.TaskHeader)
-	taskList["data"] = make([]*types.TaskHeader, 0, 10)
+	taskGetList = make(map[string][]*types.TaskHeader_Get)
 
-	iter := t.mongo.Collection.Find(nil).Iter()
-	for iter.Next(&task) {
-		// taskList[task.ID] = task
-		taskList["data"] = append(taskList["data"], task)
-		task = new(types.TaskHeader)
-	}
-
-	// 获取人员姓名
-	for _, value := range taskList["data"] {
+	var taskList []*types.TaskHeader
+	t.mongo.Collection.Find(nil).All(&taskList)
+	taskCount := len(taskList)
+	taskGetList["data"] = make([]*types.TaskHeader_Get, taskCount, taskCount)
+	for index, value := range taskList {
+		taskGet := new(types.TaskHeader_Get)
+		common.StructDeepCopy(value, taskGet)
+		// 获取人员姓名
 		emp := new(types.EmployeeName)
-		err1 := t.mongo.Db.C("M_Employees").FindId(value.PrimaryExecutorObjectID).One(&emp)
+		err1 := t.mongo.Db.C("M_Employees").FindId(*value.PrimaryExecutorObjectID).One(&emp)
 		if err1 == nil {
-			value.PrimaryExecutor = emp.Name
+			taskGet.PrimaryExecutor = emp.Name
 		}
+		taskGetList["data"][index] = taskGet
 	}
 	return
 }
-func (t *TaskDAL) GetTaskDetail(id string) (task map[string]*types.Task, err error) {
+
+func (t *TaskDAL) GetTaskDetail(id string) (taskGet map[string]*types.Task_Get, err error) {
 	t.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -54,62 +53,80 @@ func (t *TaskDAL) GetTaskDetail(id string) (task map[string]*types.Task, err err
 	if err != nil {
 		return
 	}
-	task = make(map[string]*types.Task)
-	task["data"] = new(types.Task)
-	t.mongo.Collection.Find(bson.M{"id": id}).One(task["data"])
+	taskGet = make(map[string]*types.Task_Get)
+	taskGet["data"] = new(types.Task_Get)
+	task := new(types.Task)
+	t.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	common.StructDeepCopy(task, taskGet["data"])
 
 	// 获取人员姓名
 	emp := new(types.EmployeeName)
-	err1 := t.mongo.Db.C("M_Employees").FindId(task["data"].PrimaryExecutorObjectID).One(&emp)
+	err1 := t.mongo.Db.C("M_Employees").FindId(task.PrimaryExecutorObjectID).One(&emp)
 	if err1 == nil {
-		task["data"].PrimaryExecutor = emp.Name
+		taskGet["data"].PrimaryExecutor = emp.Name
 	}
 	emp = new(types.EmployeeName)
-	err1 = t.mongo.Db.C("M_Employees").FindId(task["data"].CreatorObjectID).One(&emp)
+	err1 = t.mongo.Db.C("M_Employees").FindId(task.CreatorObjectID).One(&emp)
 	if err1 == nil {
-		task["data"].Creator = emp.Name
+		taskGet["data"].Creator = emp.Name
 	}
 	emp = new(types.EmployeeName)
-	err1 = t.mongo.Db.C("M_Employees").FindId(task["data"].PrimarySellerObjectID).One(&emp)
+	err1 = t.mongo.Db.C("M_Employees").FindId(task.PrimarySellerObjectID).One(&emp)
 	if err1 == nil {
-		task["data"].PrimarySeller = emp.Name
+		taskGet["data"].PrimarySeller = emp.Name
 	}
 	emp = new(types.EmployeeName)
-	err1 = t.mongo.Db.C("M_Employees").FindId(task["data"].PrimaryOCObjectID).One(&emp)
+	err1 = t.mongo.Db.C("M_Employees").FindId(task.PrimaryOCObjectID).One(&emp)
 	if err1 == nil {
-		task["data"].PrimaryOC = emp.Name
+		taskGet["data"].PrimaryOC = emp.Name
 	}
-	otherExecutorsCount := len(task["data"].OtherExecutorObjectIds)
-	task["data"].OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
-	for index, value := range task["data"].OtherExecutorObjectIds {
+	otherExecutorsCount := len(task.OtherExecutorObjectIds)
+	taskGet["data"].OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
+	for index, value := range task.OtherExecutorObjectIds {
 		emp = new(types.EmployeeName)
 		err1 = t.mongo.Db.C("M_Employees").FindId(value).One(&emp)
 		if err1 == nil {
-			task["data"].OtherExecutors[index] = *emp.Name
+			taskGet["data"].OtherExecutors[index] = *emp.Name
 		}
 	}
 
 	product := new(types.ProductName)
-	err1 = t.mongo.Db.C("T_Products").FindId(task["data"].ParentProductObjectID).One(&emp)
+	err1 = t.mongo.Db.C("T_Products").FindId(task.ParentProductObjectID).One(&emp)
 	if err1 == nil {
-		task["data"].ParentProduct = product.Name
+		taskGet["data"].ParentProduct = product.Name
 	}
 	project := new(types.ProjectName)
-	err1 = t.mongo.Db.C("T_Projects").FindId(task["data"].ParentProjectObjectID).One(&emp)
+	err1 = t.mongo.Db.C("T_Projects").FindId(task.ParentProjectObjectID).One(&emp)
 	if err1 == nil {
-		task["data"].ParentProject = project.Name
+		taskGet["data"].ParentProject = project.Name
 	}
 	return
 }
 
-// {
-//   "otherExecutorObjectIds": [
-//     "580dec5bacfecf773c1ec328",
-//     "580dfc4eacfecf773c1ec33a"
-//   ],
-//   "otherExecutors": null,
-//   "parentProductObjectId": "",
-//   "parentProduct": "",
-//   "parentProjectObjectId": "",
-//   "parentProject": ""
-// }
+func (t *TaskDAL) AddTask(taskPost types.Task_Post) (s map[string]map[string]string, err error) {
+	t.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer t.mongo.CloseSession()
+
+	task := new(types.Task)
+	common.StructDeepCopy(taskPost, task)
+	task.OID = bson.NewObjectId()
+	t.mongo.UseDB("local")
+
+	err = t.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	err = t.mongo.Collection.Insert(task)
+	if err != nil {
+		return
+	}
+	s = make(map[string]map[string]string)
+	s["data"] = make(map[string]string)
+	s["data"]["Id"] = *task.ID
+
+	return
+}
