@@ -10,7 +10,7 @@ func GetCommunications(id string) (c map[string][]*types.Communication, err erro
 	return
 }
 
-func AddCommunication(c types.Communication_Post) (s map[string]map[string]string, err error) {
+func AddCommunication(c types.Communication_Insert) (s map[string]map[string]string, err error) {
 	s, err = (&blls.CommunicationBLL{}).AddCommunication(c)
 	return
 }

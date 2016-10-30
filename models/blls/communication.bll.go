@@ -13,7 +13,7 @@ func (bll CommunicationBLL) GetCommunications(id string) (c map[string][]*types.
 	return
 }
 
-func (bll CommunicationBLL) AddCommunication(c types.Communication_Post) (s map[string]map[string]string, err error) {
+func (bll CommunicationBLL) AddCommunication(c types.Communication_Insert) (s map[string]map[string]string, err error) {
 	s, err = (&dals.CommunicationDAL{}).AddCommunication(c)
 	return
 }

@@ -15,12 +15,12 @@ type CommunicationController struct {
 
 // @Title AddCommunication
 // @Description create communications
-// @Param	body		body 	types.Communication_Post	true		"body for communication content"
+// @Param	body		body 	types.Communication_Insert	true		"body for communication content"
 // @Success 200 {string} types.communication.RelevantID
 // @Failure 403 body is empty
 // @router / [post]
 func (u *CommunicationController) Post() {
-	var communication types.Communication_Post
+	var communication types.Communication_Insert
 	json.Unmarshal(u.Ctx.Input.RequestBody, &communication)
 	data, err := models.AddCommunication(communication)
 	if err != nil {

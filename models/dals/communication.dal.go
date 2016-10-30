@@ -46,7 +46,7 @@ func (c *CommunicationDAL) GetCommunications(id string) (communications map[stri
 	return
 }
 
-func (c *CommunicationDAL) AddCommunication(communication types.Communication_Post) (s map[string]map[string]string, err error) {
+func (c *CommunicationDAL) AddCommunication(communication types.Communication_Insert) (s map[string]map[string]string, err error) {
 	c.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -57,7 +57,7 @@ func (c *CommunicationDAL) AddCommunication(communication types.Communication_Po
 	err = c.mongo.Db.C("T_Tasks").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
 	err = c.mongo.Db.C("T_Project").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
 	err = c.mongo.Db.C("T_Product").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	if bson.ObjectId.Valid(objectID.Oid) {
+	if bson.ObjectId.Valid(*objectID.Oid) {
 		communication.RelevantObjectID = objectID.Oid
 	} else {
 		err = errors.New("RelevantID无效。")
@@ -77,7 +77,7 @@ func (c *CommunicationDAL) AddCommunication(communication types.Communication_Po
 	}
 	s = make(map[string]map[string]string)
 	s["data"] = make(map[string]string)
-	s["data"]["relevantId"] = communication.RelevantID
+	s["data"]["relevantId"] = *communication.RelevantID
 
 	return
 }

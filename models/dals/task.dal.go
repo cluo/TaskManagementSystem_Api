@@ -54,7 +54,6 @@ func (t *TaskDAL) GetTaskDetail(id string) (task map[string]*types.Task, err err
 	if err != nil {
 		return
 	}
-
 	task = make(map[string]*types.Task)
 	task["data"] = new(types.Task)
 	t.mongo.Collection.Find(bson.M{"id": id}).One(task["data"])
@@ -86,7 +85,7 @@ func (t *TaskDAL) GetTaskDetail(id string) (task map[string]*types.Task, err err
 		emp = new(types.EmployeeName)
 		err1 = t.mongo.Db.C("M_Employees").FindId(value).One(&emp)
 		if err1 == nil {
-			task["data"].OtherExecutors[index] = emp.Name
+			task["data"].OtherExecutors[index] = *emp.Name
 		}
 	}
 
