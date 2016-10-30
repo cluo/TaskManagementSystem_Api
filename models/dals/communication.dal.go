@@ -42,23 +42,6 @@ func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet map[s
 		}
 		communicationsGet["data"][index] = communicationGet
 	}
-	// communications = make(map[string][]*types.Communication_Get)
-	// communication := new(types.Communication)
-	// communicationGet := new(types.Communication_Get)
-	// communications["data"] = make([]*types.Communication_Get, 0, 10)
-
-	// iter := c.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").Iter()
-	// for iter.Next(&communication) {
-	// 	common.StructDeepCopy(communication, communicationGet)
-	// 	emp := new(types.EmployeeName)
-	// 	err1 := c.mongo.Db.C("M_Employees").FindId(communication.PersonObjectID).One(&emp)
-	// 	if err1 == nil {
-	// 		communicationGet.PersonName = emp.Name
-	// 	}
-	// 	communications["data"] = append(communications["data"], communicationGet)
-	// 	communication = new(types.Communication)
-	// 	communicationGet = new(types.Communication_Get)
-	// }
 	return
 }
 
