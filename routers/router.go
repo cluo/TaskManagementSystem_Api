@@ -21,6 +21,11 @@ func init() {
 			),
 		),
 		beego.NSNamespace("/user",
+			beego.NSNamespace("/token",
+				beego.NSInclude(
+					&controllers.TokenController{},
+				),
+			),
 			beego.NSInclude(
 				&controllers.UserController{},
 			),
