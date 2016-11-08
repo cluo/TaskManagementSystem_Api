@@ -5,9 +5,9 @@ docker rmi 211.157.146.6:5000/task-management-api 211.157.146.6:5000/task-manage
 docker run -d -p 6009:80 --name=task-management-frontend 211.157.146.6:5000/task-management-frontend
 docker run -d --name=ambassador-mongo --expose 27017 -e MONGO_PORT_27017_TCP=tcp://172.16.2.25:27017 211.157.146.6:5000/ambassador:latest
 docker run -d --name=ambassador-oauthdb --expose 5432 -e DB_PORT_5432_TCP=tcp://172.16.2.25:5432 211.157.146.6:5000/ambassador:latest
-docker run -d -p 6001:6001 --link ambassador-mongo:mongo --name=task-management-api 211.157.146.6:5000/task-management-api
-
 docker run -d -p 6002:80 --link ambassador-oauthdb:db --name=oauth-server-service 211.157.146.6:5000/oauth-server-service
+docker run -d -p 6001:6001 --link ambassador-mongo:mongo --link oauth-server-service:oauth --name=task-management-api 211.157.146.6:5000/task-management-api
+
 
 docker run -it -p 6002:80 --link ambassador-oauthdb:db --name=oauth-server-service 211.157.146.6:5000/oauth-server-service -bash
 
