@@ -14,32 +14,12 @@ import (
 )
 
 func init() {
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/object",
-			beego.NSInclude(
-				&controllers.ObjectController{},
-			),
-		),
-		beego.NSNamespace("/user",
-			beego.NSNamespace("/token",
-				beego.NSInclude(
-					&controllers.TokenController{},
-				),
-			),
-			beego.NSInclude(
-				&controllers.UserController{},
-			),
-		),
-		beego.NSNamespace("/task",
-			beego.NSInclude(
-				&controllers.TaskController{},
-			),
-		),
-		beego.NSNamespace("/communication",
-			beego.NSInclude(
-				&controllers.CommunicationController{},
-			),
-		),
-	)
-	beego.AddNamespace(ns)
+	beego.Router("/v1/user", &controllers.UserController{})
+	beego.Router("/v1/user/token", &controllers.UserController{}, "post:Post_GetToken")
+
+	beego.Router("/v1/task", &controllers.TaskController{}, "get:GetAll;post:Post")
+	beego.Router("/v1/task/:tid", &controllers.TaskController{}, "get:Get")
+
+	beego.Router("/v1/communication/:id", &controllers.CommunicationController{}, "get:Get")
+	beego.Router("/v1/communication", &controllers.CommunicationController{}, "post:Post")
 }

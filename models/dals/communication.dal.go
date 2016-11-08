@@ -13,7 +13,7 @@ type CommunicationDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet map[string][]*types.Communication_Get, err error) {
+func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet []*types.Communication_Get, err error) {
 	c.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -25,12 +25,10 @@ func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet map[s
 		return
 	}
 
-	communicationsGet = make(map[string][]*types.Communication_Get)
-
 	var communications []*types.Communication
 	c.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").All(&communications)
 	communicationCount := len(communications)
-	communicationsGet["data"] = make([]*types.Communication_Get, communicationCount, communicationCount)
+	communicationsGet = make([]*types.Communication_Get, communicationCount, communicationCount)
 	for index, value := range communications {
 		communicationGet := new(types.Communication_Get)
 		common.StructDeepCopy(value, communicationGet)
@@ -40,12 +38,12 @@ func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet map[s
 		if err1 == nil {
 			communicationGet.PersonName = emp.Name
 		}
-		communicationsGet["data"][index] = communicationGet
+		communicationsGet[index] = communicationGet
 	}
 	return
 }
 
-func (c *CommunicationDAL) AddCommunication(communicationPost types.Communication_Post) (s map[string]map[string]string, err error) {
+func (c *CommunicationDAL) AddCommunication(communicationPost types.Communication_Post) (s map[string]string, err error) {
 	c.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -77,9 +75,8 @@ func (c *CommunicationDAL) AddCommunication(communicationPost types.Communicatio
 	if err != nil {
 		return
 	}
-	s = make(map[string]map[string]string)
-	s["data"] = make(map[string]string)
-	s["data"]["relevantId"] = *communication.RelevantID
+	s = make(map[string]string)
+	s["relevantId"] = *communication.RelevantID
 
 	return
 }

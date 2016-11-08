@@ -1,6 +1,7 @@
 package models
 
 import (
+	"TaskManagementSystem_Api/models/blls"
 	"errors"
 	"strconv"
 	"time"
@@ -34,6 +35,11 @@ func AddUser(u User) string {
 	u.Id = "user_" + strconv.FormatInt(time.Now().UnixNano(), 10)
 	UserList[u.Id] = &u
 	return u.Id
+}
+
+func GetToken(uid, password string) (token string, err error) {
+	token, err = (&blls.UserBLL{}).GetToken(uid, password)
+	return
 }
 
 func GetUser(uid string) (u *User, err error) {

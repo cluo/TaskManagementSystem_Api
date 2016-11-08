@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"TaskManagementSystem_Api/models"
+	"TaskManagementSystem_Api/models/common"
 	"TaskManagementSystem_Api/models/types"
 	"encoding/json"
 
@@ -20,14 +21,26 @@ type CommunicationController struct {
 // @Failure 403 body is empty
 // @router / [post]
 func (u *CommunicationController) Post() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
 	var communication types.Communication_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &communication)
 	data, err := models.AddCommunication(communication)
 	if err != nil {
-		u.Data["json"] = err.Error()
+		body.Error = err.Error()
 	} else {
-		u.Data["json"] = data
+		body.Data = data
 	}
+	u.Data["json"] = body
 	u.ServeJSON()
 }
 
@@ -38,14 +51,26 @@ func (u *CommunicationController) Post() {
 // @Failure 403 :uid is empty
 // @router /:uid [get]
 func (u *CommunicationController) Get() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
 	uid := u.GetString(":uid")
 	if uid != "" {
 		communication, err := models.GetCommunications(uid)
 		if err != nil {
-			u.Data["json"] = err.Error()
+			body.Error = err.Error()
 		} else {
-			u.Data["json"] = communication
+			body.Data = communication
 		}
 	}
+	u.Data["json"] = body
 	u.ServeJSON()
 }

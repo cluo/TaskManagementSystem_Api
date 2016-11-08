@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"TaskManagementSystem_Api/models"
+	"TaskManagementSystem_Api/models/common"
 	"encoding/json"
 
 	"github.com/astaxie/beego"
@@ -10,6 +11,51 @@ import (
 // Operations about Users
 type UserController struct {
 	beego.Controller
+}
+type signInUserStruct struct {
+	UID      *string `json:"uid"`
+	Password *string `json:"password"`
+}
+type ResponeBodyStruct struct {
+	Data  interface{} `json:"data"`
+	Error string      `json:"error"`
+}
+
+// @Title Post_GetToken
+// @Description get token by code
+// @Param	uid		path 	string	true		"The key for staticblock"
+// @Success 200 empty Token in Header
+// @Failure 403 userinfo is empty
+// @router user/token/ [post]
+func (u *UserController) Post_GetToken() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	if token != "" {
+		_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+		if err != nil {
+			body.Error = err.Error()
+		} else {
+			body.Data = token
+		}
+		u.Data["json"] = body
+		u.ServeJSON()
+		return
+	}
+	user := new(signInUserStruct)
+	err := json.Unmarshal(u.Ctx.Input.RequestBody, user)
+	if err != nil {
+		body.Error = err.Error()
+	} else if user.UID != nil && user.Password != nil {
+		token, err := models.GetToken(*user.UID, *user.Password)
+		if err != nil {
+			body.Error = err.Error()
+			// u.Ctx.Output.SetStatus(401)
+		} else {
+			body.Data = token
+		}
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
 }
 
 // @Title CreateUser

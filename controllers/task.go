@@ -5,13 +5,14 @@ import (
 	"TaskManagementSystem_Api/models/types"
 	"encoding/json"
 
+	"TaskManagementSystem_Api/models/common"
+
 	"github.com/astaxie/beego"
 )
 
 // Operations about Tasks
 type TaskController struct {
 	beego.Controller
-	task12312 types.TaskHeader
 }
 
 // @Title CreateTask
@@ -21,14 +22,26 @@ type TaskController struct {
 // @Failure 403 body is empty
 // @router / [post]
 func (u *TaskController) Post() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
 	var task types.Task_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
 	data, err := models.AddTask(task)
 	if err != nil {
-		u.Data["json"] = err.Error()
+		body.Error = err.Error()
 	} else {
-		u.Data["json"] = data
+		body.Data = data
 	}
+	u.Data["json"] = body
 	u.ServeJSON()
 }
 
@@ -37,30 +50,54 @@ func (u *TaskController) Post() {
 // @Success 200 {object} types.TaskHeader_Get
 // @router / [get]
 func (u *TaskController) GetAll() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
 	tasks, err := models.GetAllTasks()
 	if err != nil {
-		u.Data["json"] = err.Error()
+		body.Error = err.Error()
 	} else {
-		u.Data["json"] = tasks
+		body.Data = tasks
 	}
+	u.Data["json"] = body
 	u.ServeJSON()
 }
 
 // @Title Get
-// @Description get task by uid
-// @Param	uid		path 	string	true		"The key for staticblock"
+// @Description get task by tid
+// @Param	tid		path 	string	true		"The key for staticblock"
 // @Success 200 {object} types.Task_Get
-// @Failure 403 :uid is empty
-// @router /:uid [get]
+// @Failure 403 :tid is empty
+// @router /:tid [get]
 func (u *TaskController) Get() {
-	uid := u.GetString(":uid")
-	if uid != "" {
-		task, err := models.GetTask(uid)
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	if tid != "" {
+		task, err := models.GetTask(tid)
 		if err != nil {
-			u.Data["json"] = err.Error()
+			body.Error = err.Error()
 		} else {
-			u.Data["json"] = task
+			body.Data = task
 		}
+		u.Data["json"] = body
 	}
 	u.ServeJSON()
 }
