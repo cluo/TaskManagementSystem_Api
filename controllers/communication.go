@@ -44,11 +44,11 @@ func (u *CommunicationController) Post() {
 }
 
 // @Title Get
-// @Description get communication by tid
-// @Param	tid		path 	string	true		"The key for staticblock"
+// @Description get communication by id
+// @Param	id		path 	string	true		"The key for staticblock"
 // @Success 200 {object} types.Communication_Get
-// @Failure 403 :tid is empty
-// @router /:tid [get]
+// @Failure 403 :id is empty
+// @router /:id [get]
 func (u *CommunicationController) Get() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
@@ -61,9 +61,9 @@ func (u *CommunicationController) Get() {
 		return
 	}
 
-	tid := u.GetString(":tid")
-	if tid != "" {
-		communication, err := (&blls.CommunicationBLL{}).GetCommunications(tid)
+	id := u.GetString(":id")
+	if id != "" {
+		communication, err := (&blls.CommunicationBLL{}).GetCommunications(id)
 		if err != nil {
 			body.Error = err.Error()
 		} else {
