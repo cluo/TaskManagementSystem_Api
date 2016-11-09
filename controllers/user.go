@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"TaskManagementSystem_Api/models"
-	"TaskManagementSystem_Api/models/common"
+	"TaskManagementSystem_Api/models/blls"
 	"encoding/json"
 
 	"github.com/astaxie/beego"
@@ -31,7 +31,7 @@ func (u *UserController) Post_GetToken() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
 	if token != "" {
-		_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+		err := (&blls.UserBLL{}).ValidateToken(token)
 		if err != nil {
 			body.Error = err.Error()
 		} else {
@@ -46,7 +46,7 @@ func (u *UserController) Post_GetToken() {
 	if err != nil {
 		body.Error = err.Error()
 	} else if user.UID != nil && user.Password != nil {
-		token, err := models.GetToken(*user.UID, *user.Password)
+		token, err := (&blls.UserBLL{}).GetToken(*user.UID, *user.Password)
 		if err != nil {
 			body.Error = err.Error()
 			// u.Ctx.Output.SetStatus(401)
@@ -56,6 +56,21 @@ func (u *UserController) Post_GetToken() {
 	}
 	u.Data["json"] = body
 	u.ServeJSON()
+}
+
+func (u *UserController) GetMyUserInfo() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	userinfo, err := (&blls.UserBLL{}).GetUserInfo(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Ctx.Output.SetStatus(401)
+	} else {
+		body.Data = userinfo
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
+	return
 }
 
 // @Title CreateUser

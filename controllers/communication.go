@@ -1,8 +1,7 @@
 package controllers
 
 import (
-	"TaskManagementSystem_Api/models"
-	"TaskManagementSystem_Api/models/common"
+	"TaskManagementSystem_Api/models/blls"
 	"TaskManagementSystem_Api/models/types"
 	"encoding/json"
 
@@ -23,7 +22,7 @@ type CommunicationController struct {
 func (u *CommunicationController) Post() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -34,7 +33,7 @@ func (u *CommunicationController) Post() {
 
 	var communication types.Communication_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &communication)
-	data, err := models.AddCommunication(communication)
+	data, err := (&blls.CommunicationBLL{}).AddCommunication(communication)
 	if err != nil {
 		body.Error = err.Error()
 	} else {
@@ -53,7 +52,7 @@ func (u *CommunicationController) Post() {
 func (u *CommunicationController) Get() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -64,7 +63,7 @@ func (u *CommunicationController) Get() {
 
 	uid := u.GetString(":uid")
 	if uid != "" {
-		communication, err := models.GetCommunications(uid)
+		communication, err := (&blls.CommunicationBLL{}).GetCommunications(uid)
 		if err != nil {
 			body.Error = err.Error()
 		} else {

@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"TaskManagementSystem_Api/models"
+	"TaskManagementSystem_Api/models/blls"
 	"TaskManagementSystem_Api/models/types"
 	"encoding/json"
-
-	"TaskManagementSystem_Api/models/common"
 
 	"github.com/astaxie/beego"
 )
@@ -18,13 +16,13 @@ type TaskController struct {
 // @Title CreateTask
 // @Description create tasks
 // @Param	body		body 	types.Task_Post	true		"body for task content"
-// @Success 200 {int} models.Task.Id
+// @Success 200 {int} (&blls.TaskBLL{}).Task.Id
 // @Failure 403 body is empty
 // @router / [post]
 func (u *TaskController) Post() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -35,7 +33,7 @@ func (u *TaskController) Post() {
 
 	var task types.Task_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
-	data, err := models.AddTask(task)
+	data, err := (&blls.TaskBLL{}).AddTask(task)
 	if err != nil {
 		body.Error = err.Error()
 	} else {
@@ -52,7 +50,7 @@ func (u *TaskController) Post() {
 func (u *TaskController) GetAll() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -61,7 +59,7 @@ func (u *TaskController) GetAll() {
 		return
 	}
 
-	tasks, err := models.GetAllTasks()
+	tasks, err := (&blls.TaskBLL{}).GetAllTasks()
 	if err != nil {
 		body.Error = err.Error()
 	} else {
@@ -80,7 +78,7 @@ func (u *TaskController) GetAll() {
 func (u *TaskController) Get() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&common.AuthorizeStruct{}).ValidateAuthorize(token)
+	err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -91,7 +89,7 @@ func (u *TaskController) Get() {
 
 	tid := u.GetString(":tid")
 	if tid != "" {
-		task, err := models.GetTask(tid)
+		task, err := (&blls.TaskBLL{}).GetTaskDetail(tid)
 		if err != nil {
 			body.Error = err.Error()
 		} else {
@@ -106,15 +104,15 @@ func (u *TaskController) Get() {
 // @Description update the task
 // @Param	uid		path 	string	true		"The uid you want to update"
 // @Param	body		body 	types.Task	true		"body for task content"
-// @Success 200 {object} models.Task
+// @Success 200 {object} (&blls.TaskBLL{}).Task
 // @Failure 403 :uid is not int
 // @router /:uid [put]
 func (u *TaskController) Put() {
 	// uid := u.GetString(":uid")
 	// if uid != "" {
-	// 	var task models.Task
+	// 	var task (&blls.TaskBLL{}).Task
 	// 	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
-	// 	uu, err := models.UpdateTask(uid, &task)
+	// 	uu, err := (&blls.TaskBLL{}).UpdateTask(uid, &task)
 	// 	if err != nil {
 	// 		u.Data["json"] = err.Error()
 	// 	} else {
@@ -132,7 +130,7 @@ func (u *TaskController) Put() {
 // @router /:uid [delete]
 func (u *TaskController) Delete() {
 	// uid := u.GetString(":uid")
-	// models.DeleteTask(uid)
+	// (&blls.TaskBLL{}).DeleteTask(uid)
 	// u.Data["json"] = "delete success!"
 	// u.ServeJSON()
 }

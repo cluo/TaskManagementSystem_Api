@@ -13,20 +13,20 @@ type CommunicationDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet []*types.Communication_Get, err error) {
-	c.mongo, err = common.GetMongoSession()
+func (dal *CommunicationDAL) GetCommunications(id string) (communicationsGet []*types.Communication_Get, err error) {
+	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
 	}
-	defer c.mongo.CloseSession()
-	c.mongo.UseDB("local")
-	err = c.mongo.UseCollection("T_Communications")
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Communications")
 	if err != nil {
 		return
 	}
 
 	var communications []*types.Communication
-	c.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").All(&communications)
+	dal.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").All(&communications)
 	communicationCount := len(communications)
 	communicationsGet = make([]*types.Communication_Get, communicationCount, communicationCount)
 	for index, value := range communications {
@@ -34,7 +34,7 @@ func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet []*ty
 		common.StructDeepCopy(value, communicationGet)
 		// 获取人员姓名
 		emp := new(types.EmployeeName)
-		err1 := c.mongo.Db.C("M_Employees").FindId(value.PersonObjectID).One(&emp)
+		err1 := dal.mongo.Db.C("M_Employees").FindId(value.PersonObjectID).One(&emp)
 		if err1 == nil {
 			communicationGet.PersonName = emp.Name
 		}
@@ -43,20 +43,20 @@ func (c *CommunicationDAL) GetCommunications(id string) (communicationsGet []*ty
 	return
 }
 
-func (c *CommunicationDAL) AddCommunication(communicationPost types.Communication_Post) (s map[string]string, err error) {
-	c.mongo, err = common.GetMongoSession()
+func (dal *CommunicationDAL) AddCommunication(communicationPost types.Communication_Post) (s map[string]string, err error) {
+	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
 	}
-	defer c.mongo.CloseSession()
+	defer dal.mongo.CloseSession()
 	communication := new(types.Communication)
 	common.StructDeepCopy(communicationPost, communication)
 	communication.OID = bson.NewObjectId()
-	c.mongo.UseDB("local")
+	dal.mongo.UseDB("local")
 	objectID := new(types.ObjectID)
-	err = c.mongo.Db.C("T_Tasks").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	err = c.mongo.Db.C("T_Project").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	err = c.mongo.Db.C("T_Product").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
+	err = dal.mongo.Db.C("T_Tasks").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
+	err = dal.mongo.Db.C("T_Project").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
+	err = dal.mongo.Db.C("T_Product").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
 	if bson.ObjectId.Valid(*objectID.Oid) {
 		communication.RelevantObjectID = objectID.Oid
 	} else {
@@ -64,14 +64,14 @@ func (c *CommunicationDAL) AddCommunication(communicationPost types.Communicatio
 	}
 
 	objectID = new(types.ObjectID)
-	err = c.mongo.Db.C("M_Employees").Find(bson.M{"empId": communication.PersonID}).One(&objectID)
+	err = dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": communication.PersonID}).One(&objectID)
 	communication.PersonObjectID = objectID.Oid
 
-	err = c.mongo.UseCollection("T_Communications")
+	err = dal.mongo.UseCollection("T_Communications")
 	if err != nil {
 		return
 	}
-	err = c.mongo.Collection.Insert(communication)
+	err = dal.mongo.Collection.Insert(communication)
 	if err != nil {
 		return
 	}

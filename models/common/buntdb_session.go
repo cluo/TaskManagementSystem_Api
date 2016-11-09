@@ -33,11 +33,12 @@ func (session *BuntDBSessionStruct) Set(key, value string) (err error) {
 }
 
 func (session *BuntDBSessionStruct) Get(key string) (value string, err error) {
-	err = session.Db.View(func(tx *buntdb.Tx) error {
+	err = session.Db.Update(func(tx *buntdb.Tx) error {
 		val, err1 := tx.Get(key)
 		if err1 != nil {
 			return err1
 		}
+		_, _, _ = tx.Set(key, val, &buntdb.SetOptions{Expires: true, TTL: time.Second * 3600})
 		value = val
 		return nil
 	})
