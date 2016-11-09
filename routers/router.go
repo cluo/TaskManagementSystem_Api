@@ -20,6 +20,6 @@ func init() {
 	beego.Router("/v1/task", &controllers.TaskController{}, "get:GetAll;post:Post")
 	beego.Router("/v1/task/:tid", &controllers.TaskController{}, "get:Get")
 
-	beego.Router("/v1/communication/:id", &controllers.CommunicationController{}, "get:Get")
+	beego.Router("/v1/communication/:tid", &controllers.CommunicationController{}, "get:Get")
 	beego.Router("/v1/communication", &controllers.CommunicationController{}, "post:Post")
 }
