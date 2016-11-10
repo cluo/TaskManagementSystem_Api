@@ -13,9 +13,9 @@ import (
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	err := common.Bunt.InitDB()
+	err := common.InitRedis()
 	if err != nil {
-		log.Fatalln("BuntDB启动失败！")
+		log.Fatalln("Redis连接初始化失败！")
 	}
 	defer common.Bunt.CloseDB()
 

@@ -21,11 +21,11 @@ func (bll *UserBLL) GetToken(uid, password string) (token string, err error) {
 		return
 	}
 	userInfo, _ := json.Marshal(user)
-	common.Bunt.Set(token, string(userInfo))
+	common.SetRedis(token, string(userInfo))
 	return
 }
 func (bll *UserBLL) GetUserInfo(token string) (u types.UserInfo_Get, err error) {
-	userinfo, err := common.Bunt.Get(token)
+	userinfo, err := common.GetRedis(token)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (bll *UserBLL) GetUserInfo(token string) (u types.UserInfo_Get, err error) 
 }
 
 func (bll *UserBLL) ValidateToken(token string) (err error) {
-	_, err = common.Bunt.Get(token)
+	_, err = common.GetRedis(token)
 	if err != nil {
 		return
 	}
