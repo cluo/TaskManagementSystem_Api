@@ -13,7 +13,7 @@ type UserDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-func (dal *UserDAL) GetUserInfo(uid string) (u *types.UserInfo_Get, err error) {
+func (dal *UserDAL) GetUserInfo(uid string, password *string) (u *types.UserInfo_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -26,7 +26,11 @@ func (dal *UserDAL) GetUserInfo(uid string) (u *types.UserInfo_Get, err error) {
 	}
 
 	oid := new(types.EmployeeOid)
-	dal.mongo.Collection.Find(bson.M{"username": uid}).One(oid)
+	if password != nil {
+		dal.mongo.Collection.Find(bson.M{"username": uid}).One(oid)
+	} else {
+		dal.mongo.Collection.Find(bson.M{"username": uid, "password": *password}).One(oid)
+	}
 	if oid.OID == nil {
 		err = errors.New("该用户在任务管理系统用户表中不存在，请联系管理员。")
 		return

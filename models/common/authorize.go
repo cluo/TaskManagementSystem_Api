@@ -2,6 +2,7 @@ package common
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -11,7 +12,7 @@ import (
 type TokenStruct struct {
 }
 
-func (a *TokenStruct) createToken(uid string) (token string, err error) {
+func (a *TokenStruct) CreateToken(uid string) (token string, err error) {
 	crutime := time.Now().UnixNano()
 	rand.Seed(crutime)
 	sha := sha1.New()
@@ -20,11 +21,11 @@ func (a *TokenStruct) createToken(uid string) (token string, err error) {
 	return
 }
 
-func (a *TokenStruct) ApplyAuthorize(uid, password string) (token string, err error) {
+func (a *TokenStruct) ApplyAuthorize(uid, password string) (err error) {
 	_, err = (&OAuthServiceStruct{}).GetOAuth2Token(uid, password)
 	if err != nil {
+		err = errors.New("该用户不存在，请联系管理员。")
 		return
 	}
-	token, err = a.createToken(uid)
 	return
 }

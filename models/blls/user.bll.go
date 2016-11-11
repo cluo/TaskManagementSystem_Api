@@ -4,20 +4,40 @@ import (
 	"TaskManagementSystem_Api/models/common"
 	"TaskManagementSystem_Api/models/dals"
 	"TaskManagementSystem_Api/models/types"
+	"crypto/sha1"
 	"encoding/json"
+	"fmt"
+	"io"
+	"strings"
+
+	"github.com/astaxie/beego"
 )
 
 type UserBLL struct {
 }
 
+var authorizationMethod = strings.ToLower(beego.AppConfig.String("authorization_method"))
+
 func (bll *UserBLL) GetToken(uid, password string) (token string, err error) {
-	token, err = (&common.TokenStruct{}).ApplyAuthorize(uid, password)
-	if err != nil {
-		return
+	var passwordSha1 *string
+	if authorizationMethod == "oauth" {
+		err = (&common.TokenStruct{}).ApplyAuthorize(uid, password)
+		if err != nil {
+			return
+		}
+	} else {
+		sha := sha1.New()
+		io.WriteString(sha, fmt.Sprintf("%s", password))
+		shaString := fmt.Sprintf("%x", sha.Sum(nil))
+		passwordSha1 = &shaString
 	}
-	user, err := (&dals.UserDAL{}).GetUserInfo(uid)
+	user, err := (&dals.UserDAL{}).GetUserInfo(uid, passwordSha1)
 	if err != nil {
 		token = ""
+		return
+	}
+	token, err = (&common.TokenStruct{}).CreateToken(uid)
+	if err != nil {
 		return
 	}
 	userInfo, _ := json.Marshal(user)

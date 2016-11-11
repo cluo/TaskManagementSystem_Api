@@ -5,4 +5,4 @@ COPY ./main /task_management_api/main
 
 CMD ["/task_management_api/main"]
 
-EXPOSE 6001
+EXPOSE 80
