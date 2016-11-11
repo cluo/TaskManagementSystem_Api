@@ -8,11 +8,14 @@ import (
 type TaskBLL struct {
 }
 
-func (bll *TaskBLL) GetAllTasks() (t []*types.TaskHeader_Get, err error) {
-	t, err = (&dals.TaskDAL{}).GetAllTaskHeaders()
+func (bll *TaskBLL) GetTasks(pageSize, pageNumber int) (t []*types.TaskHeader_Get, err error) {
+	t, err = (&dals.TaskDAL{}).GetTaskHeaders(pageSize, pageNumber)
 	return
 }
-
+func (bll *TaskBLL) GetTaskCount() (counts map[string]int, err error) {
+	counts, err = (&dals.TaskDAL{}).GetTaskCount()
+	return
+}
 func (bll *TaskBLL) GetTaskDetail(id string) (t *types.Task_Get, err error) {
 	t, err = (&dals.TaskDAL{}).GetTaskDetail(id)
 	return

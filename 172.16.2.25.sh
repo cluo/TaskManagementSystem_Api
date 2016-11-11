@@ -17,6 +17,9 @@ docker kill redis task-management-mongo; \
 
 docker run -d --name=task-management-mongo 211.157.146.6:5000/mongodb-enterprise
 docker run -d --name=redis 211.157.146.6:5000/redis
+docker run -d --link task-management-mongo:mongo --link redis:redis \
+    -p 27017:27017 -p 6379:6379 \
+    --name=ambassador 211.157.146.6:5000/ambassador:latest
 
 docker kill api2 ambassador; \
     docker rm api2 ambassador;

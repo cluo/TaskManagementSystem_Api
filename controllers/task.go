@@ -43,11 +43,39 @@ func (u *TaskController) Post() {
 	u.ServeJSON()
 }
 
-// @Title GetAll
+// @Title GetList
 // @Description get all Tasks (Header)
 // @Success 200 {object} types.TaskHeader_Get
 // @router / [get]
-func (u *TaskController) GetAll() {
+func (u *TaskController) GetList() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+	pageSize, _ := u.GetInt("pagesize", 5)
+	pageNumber, _ := u.GetInt("pagenumber", 1)
+
+	tasks, err := (&blls.TaskBLL{}).GetTasks(pageSize, pageNumber)
+	if err != nil {
+		body.Error = err.Error()
+	} else {
+		body.Data = tasks
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
+}
+
+// @Title GetTaskCount
+// @Description get Task Count
+// @Success 200 {object}
+// @router / [get]
+func (u *TaskController) GetTaskCount() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
 	err := (&blls.UserBLL{}).ValidateToken(token)
@@ -59,11 +87,11 @@ func (u *TaskController) GetAll() {
 		return
 	}
 
-	tasks, err := (&blls.TaskBLL{}).GetAllTasks()
+	counts, err := (&blls.TaskBLL{}).GetTaskCount()
 	if err != nil {
 		body.Error = err.Error()
 	} else {
-		body.Data = tasks
+		body.Data = counts
 	}
 	u.Data["json"] = body
 	u.ServeJSON()

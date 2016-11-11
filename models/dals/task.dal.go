@@ -17,8 +17,8 @@ type TaskDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-// GetAllTaskHeaders 定义
-func (dal *TaskDAL) GetAllTaskHeaders() (taskGetList []*types.TaskHeader_Get, err error) {
+// GetTaskHeaders 定义
+func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int) (taskGetList []*types.TaskHeader_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -30,8 +30,17 @@ func (dal *TaskDAL) GetAllTaskHeaders() (taskGetList []*types.TaskHeader_Get, er
 		return
 	}
 
+	if pageSize < 5 {
+		pageSize = 5
+	}
+	if pageNumber < 1 {
+		pageNumber = 1
+	}
 	var taskList []*types.TaskHeader
-	dal.mongo.Collection.Find(nil).All(&taskList)
+	err = dal.mongo.Collection.Find(nil).Sort("-tid").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
+	if err != nil {
+		return
+	}
 	taskCount := len(taskList)
 	taskGetList = make([]*types.TaskHeader_Get, taskCount, taskCount)
 	for index, value := range taskList {
@@ -47,6 +56,50 @@ func (dal *TaskDAL) GetAllTaskHeaders() (taskGetList []*types.TaskHeader_Get, er
 		}
 		taskGetList[index] = taskGet
 	}
+	return
+}
+
+// GetTaskCount 定义
+func (dal *TaskDAL) GetTaskCount() (counts map[string]int, err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+	counts = make(map[string]int)
+	// 所有任务数
+	totalCount, err1 := dal.mongo.Collection.Find(nil).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	counts["total"] = totalCount
+	// 未开始任务数
+	notStartedCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "未开始"}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	counts["notStarted"] = notStartedCount
+	// 进行中任务数
+	onGoingCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": time.Now()}}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	counts["onGoing"] = onGoingCount
+	// 超时任务数
+	overtimeCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$gt": time.Now()}}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	counts["overtime"] = overtimeCount
 	return
 }
 
