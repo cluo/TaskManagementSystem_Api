@@ -26,7 +26,7 @@ func (dal *UserDAL) GetUserInfo(uid string, password *string) (u *types.UserInfo
 	}
 
 	oid := new(types.EmployeeOid)
-	if password != nil {
+	if password == nil {
 		dal.mongo.Collection.Find(bson.M{"username": uid}).One(oid)
 	} else {
 		dal.mongo.Collection.Find(bson.M{"username": uid, "password": *password}).One(oid)
