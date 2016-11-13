@@ -25,20 +25,16 @@
 
 docker kill task-nginx ambassador api1 api2 api3 frontend1 frontend2 frontend3; \
     docker rm task-nginx ambassador api1 api2 api3 frontend1 frontend2 frontend3;
-
 docker rmi 211.157.146.6:5000/task-management-api \
     211.157.146.6:5000/task-management-frontend \
     211.157.146.6:5000/oauth-server-service \
     211.157.146.6:5000/task-nginx
-
-
-docker run -d --name=frontend1 211.157.146.6:5000/task-management-frontend
-docker run -d --link ambassador:mongo --link ambassador:redis --name=api1 211.157.146.6:5000/task-management-api
-
 docker run -d --name=ambassador --expose 27017 --expose 6379 \
     -e MONGO_PORT_27017_TCP=tcp://172.16.2.25:27017 \
     -e REDIS_PORT_6379_TCP=tcp://172.16.2.25:6379 \
     211.157.146.6:5000/ambassador:latest
+docker run -d --name=frontend1 211.157.146.6:5000/task-management-frontend
+docker run -d --link ambassador:mongo --link ambassador:redis --name=api1 211.157.146.6:5000/task-management-api
 docker run -d --name=task-nginx -p 6001:6001 -p 6009:6009 \
     --link frontend1:frontend1 --link api1:api1 \
     211.157.146.6:5000/task-nginx
