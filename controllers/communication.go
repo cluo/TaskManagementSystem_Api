@@ -22,7 +22,7 @@ type CommunicationController struct {
 func (u *CommunicationController) Post() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	err := (&blls.UserBLL{}).ValidateToken(token)
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -52,7 +52,7 @@ func (u *CommunicationController) Post() {
 func (u *CommunicationController) Get() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	err := (&blls.UserBLL{}).ValidateToken(token)
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body

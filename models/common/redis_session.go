@@ -56,7 +56,7 @@ func GetRedis(key string) (value string, err error) {
 	}
 	if reply == nil {
 		value = ""
-		err = errors.New("当前KEY不存在！")
+		err = errors.New("当前用户Token无效！")
 		return
 	}
 

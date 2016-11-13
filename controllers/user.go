@@ -21,21 +21,21 @@ type ResponeBodyStruct struct {
 	Error string      `json:"error"`
 }
 
-// @Title Post_GetToken
+// @Title SignIn
 // @Description get token by code
 // @Param	uid		path 	string	true		"The key for staticblock"
 // @Success 200 empty Token in Header
 // @Failure 403 userinfo is empty
 // @router user/token/ [post]
-func (u *UserController) Post_GetToken() {
+func (u *UserController) SignIn() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
 	if token != "" {
-		err := (&blls.UserBLL{}).ValidateToken(token)
+		userinfo, err := (&blls.UserBLL{}).ValidateToken(token)
 		if err != nil {
 			body.Error = err.Error()
 		} else {
-			body.Data = token
+			body.Data = userinfo
 		}
 		u.Data["json"] = body
 		u.ServeJSON()
@@ -46,12 +46,12 @@ func (u *UserController) Post_GetToken() {
 	if err != nil {
 		body.Error = err.Error()
 	} else if user.UID != nil && user.Password != nil {
-		token, err := (&blls.UserBLL{}).GetToken(*user.UID, *user.Password)
+		userinfo, err := (&blls.UserBLL{}).SignIn(*user.UID, *user.Password)
 		if err != nil {
 			body.Error = err.Error()
 			// u.Ctx.Output.SetStatus(401)
 		} else {
-			body.Data = token
+			body.Data = userinfo
 		}
 	}
 	u.Data["json"] = body

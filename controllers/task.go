@@ -22,7 +22,7 @@ type TaskController struct {
 func (u *TaskController) Post() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	err := (&blls.UserBLL{}).ValidateToken(token)
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -50,7 +50,7 @@ func (u *TaskController) Post() {
 func (u *TaskController) GetList() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	err := (&blls.UserBLL{}).ValidateToken(token)
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -78,7 +78,7 @@ func (u *TaskController) GetList() {
 func (u *TaskController) GetTaskCount() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	err := (&blls.UserBLL{}).ValidateToken(token)
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -106,7 +106,7 @@ func (u *TaskController) GetTaskCount() {
 func (u *TaskController) Get() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	err := (&blls.UserBLL{}).ValidateToken(token)
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
