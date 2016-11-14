@@ -198,7 +198,35 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (s map[string]string, err 
 		id = fmt.Sprintf("T%s%04d", dateString, maxNum+1)
 	}
 	task.ID = &id
-
+	task.CreatedTime = time.Now()
+	objectID := new(types.ObjectID)
+	err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": task.CreatorID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		task.CreatorID = nil
+	} else {
+		task.CreatorObjectID = objectID.Oid
+	}
+	objectID = new(types.ObjectID)
+	dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": task.PrimarySellerID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		task.PrimarySellerID = nil
+	} else {
+		task.PrimarySellerObjectID = objectID.Oid
+	}
+	objectID = new(types.ObjectID)
+	dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": task.PrimaryOCID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		task.PrimaryOCID = nil
+	} else {
+		task.PrimaryOCObjectID = objectID.Oid
+	}
+	objectID = new(types.ObjectID)
+	dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": task.PrimaryExecutorID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		task.PrimaryExecutorID = nil
+	} else {
+		task.PrimaryExecutorObjectID = objectID.Oid
+	}
 	err = dal.mongo.Collection.Insert(task)
 	if err != nil && strings.Contains(err.Error(), "E11000 duplicate key error collection:") {
 		return dal.AddTask(taskPost)
