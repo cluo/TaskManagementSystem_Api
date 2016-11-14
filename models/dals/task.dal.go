@@ -198,7 +198,8 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (s map[string]string, err 
 		id = fmt.Sprintf("T%s%04d", dateString, maxNum+1)
 	}
 	task.ID = &id
-	task.CreatedTime = time.Now()
+	now := time.Now()
+	task.CreatedTime = &now
 	objectID := new(types.ObjectID)
 	err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": task.CreatorID}).One(&objectID)
 	if err1 != nil || objectID.Oid == nil {
