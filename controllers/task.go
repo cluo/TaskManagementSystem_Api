@@ -59,7 +59,7 @@ func (u *TaskController) GetList() {
 		return
 	}
 	pageSize, _ := u.GetInt("pagesize", 5)
-	pageNumber, _ := u.GetInt("pagenumber", 1)
+	pageNumber, _ := u.GetInt("page", 1)
 
 	tasks, err := (&blls.TaskBLL{}).GetTasks(pageSize, pageNumber)
 	if err != nil {
