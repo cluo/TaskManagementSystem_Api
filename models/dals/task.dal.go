@@ -200,6 +200,10 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (s map[string]string, err 
 	task.ID = &id
 	now := time.Now()
 	task.CreatedTime = &now
+	status := "新建"
+	task.Status = &status
+	percent := 0
+	task.Percent = &percent
 	objectID := new(types.ObjectID)
 	err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": task.CreatorID}).One(&objectID)
 	if err1 != nil || objectID.Oid == nil {
