@@ -15,6 +15,7 @@ type TaskHeader struct {
 	RealBeginDate           *time.Time     `bson:"realBeginDate"`
 	RealEndDate             *time.Time     `bson:"realEndDate"`
 	Status                  *string        `bson:"status"`
+	CreatorID               *string        `bson:"creatorId"`
 	PrimaryExecutorID       *string        `bson:"primaryExecutorId"`
 	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
 	PrimaryExecutor         *string        `bson:"primaryExecutor"`
@@ -74,6 +75,7 @@ type TaskHeader_Get struct {
 	RealBeginDate     *time.Time `json:"realBeginDate"`
 	RealEndDate       *time.Time `json:"realEndDate"`
 	Status            *string    `json:"status"`
+	CreatorID         *string    `json:"creatorId"`
 	PrimaryExecutorID *string    `json:"primaryExecutorId"`
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
 }
