@@ -37,7 +37,7 @@ func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int) (taskGetList []*typ
 		pageNumber = 1
 	}
 	var taskList []*types.TaskHeader
-	err = dal.mongo.Collection.Find(nil).Sort("-tid").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
+	err = dal.mongo.Collection.Find(nil).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
 	if err != nil {
 		return
 	}
