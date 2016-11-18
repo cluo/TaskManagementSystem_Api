@@ -24,3 +24,8 @@ func (bll *TaskBLL) AddTask(taskPost types.Task_Post) (s map[string]string, err 
 	s, err = (&dals.TaskDAL{}).AddTask(taskPost)
 	return
 }
+
+func (bll *TaskBLL) DeleteTask(id string, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).DeleteTask(id, user)
+	return
+}

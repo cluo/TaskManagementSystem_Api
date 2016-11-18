@@ -152,13 +152,29 @@ func (u *TaskController) Put() {
 
 // @Title Delete
 // @Description delete the task
-// @Param	uid		path 	string	true		"The uid you want to delete"
-// @Success 200 {string} delete success!
-// @Failure 403 uid is empty
-// @router /:uid [delete]
+// @Param	tid		path 	string	true		"The tid you want to delete"
+// @Success 200 delete success!
+// @Failure 403 tid is empty
+// @router /:tid [delete]
 func (u *TaskController) Delete() {
-	// uid := u.GetString(":uid")
-	// (&blls.TaskBLL{}).DeleteTask(uid)
-	// u.Data["json"] = "delete success!"
-	// u.ServeJSON()
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	err = (&blls.TaskBLL{}).DeleteTask(tid, user)
+	if err != nil {
+		body.Data = "delete success!"
+	} else {
+		body.Error = err.Error()
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
 }

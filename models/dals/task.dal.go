@@ -244,3 +244,37 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (s map[string]string, err 
 
 	return
 }
+
+// DeleteTask 定义
+func (dal *TaskDAL) DeleteTask(id string, user types.UserInfo_Get) (err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	task := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	if err != nil {
+		return
+	}
+	if *task.Status != "新建" && !user.CheckPermissions(1) {
+		err = errors.New("任务状态不是新建，不能删除当前记录。")
+		return
+	}
+	if *task.CreatorID != *user.EmpID && !user.CheckPermissions(1) {
+		err = errors.New("与任务创建者不是同一用户，不能删除当前记录。")
+		return
+	}
+	err = dal.mongo.Collection.RemoveId(task.OID)
+	if err != nil {
+		return
+	}
+	dal.mongo.Db.C("T_Communications").RemoveAll(bson.M{"relevantId": id})
+	return
+}
