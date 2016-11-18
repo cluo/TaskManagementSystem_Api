@@ -170,7 +170,7 @@ func (u *TaskController) Delete() {
 
 	tid := u.GetString(":tid")
 	err = (&blls.TaskBLL{}).DeleteTask(tid, user)
-	if err != nil {
+	if err == nil {
 		body.Data = "delete success!"
 	} else {
 		body.Error = err.Error()
