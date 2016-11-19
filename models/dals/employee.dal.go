@@ -5,10 +5,12 @@ import (
 	"TaskManagementSystem_Api/models/types"
 )
 
+// EmployeeDAL 定义
 type EmployeeDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
+// GetAllEmployees 定义
 func (dal *EmployeeDAL) GetAllEmployees() (e []*types.Employee_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {

@@ -13,6 +13,7 @@ type UserDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
+// GetUserInfo 定义
 func (dal *UserDAL) GetUserInfo(uid string, password *string) (u *types.UserInfo_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {

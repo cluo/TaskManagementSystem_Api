@@ -9,10 +9,12 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// CommunicationDAL 定义
 type CommunicationDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
+// GetCommunications 定义
 func (dal *CommunicationDAL) GetCommunications(id string) (communicationsGet []*types.Communication_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
@@ -43,6 +45,7 @@ func (dal *CommunicationDAL) GetCommunications(id string) (communicationsGet []*
 	return
 }
 
+// AddCommunication 定义
 func (dal *CommunicationDAL) AddCommunication(communicationPost types.Communication_Post) (s map[string]string, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {

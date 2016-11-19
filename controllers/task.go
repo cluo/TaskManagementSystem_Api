@@ -33,11 +33,11 @@ func (u *TaskController) Post() {
 
 	var task types.Task_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
-	data, err := (&blls.TaskBLL{}).AddTask(task)
+	err = (&blls.TaskBLL{}).AddTask(task)
 	if err != nil {
 		body.Error = err.Error()
 	} else {
-		body.Data = data
+		body.Data = "insert success!"
 	}
 	u.Data["json"] = body
 	u.ServeJSON()
@@ -136,18 +136,29 @@ func (u *TaskController) Get() {
 // @Failure 403 :uid is not int
 // @router /:uid [put]
 func (u *TaskController) Put() {
-	// uid := u.GetString(":uid")
-	// if uid != "" {
-	// 	var task (&blls.TaskBLL{}).Task
-	// 	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
-	// 	uu, err := (&blls.TaskBLL{}).UpdateTask(uid, &task)
-	// 	if err != nil {
-	// 		u.Data["json"] = err.Error()
-	// 	} else {
-	// 		u.Data["json"] = uu
-	// 	}
-	// }
-	// u.ServeJSON()
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	if tid != "" {
+		var task types.Task_Post
+		json.Unmarshal(u.Ctx.Input.RequestBody, &task)
+		err = (&blls.TaskBLL{}).UpdateTask(tid, task, user)
+		if err == nil {
+			body.Data = "update success!"
+		} else {
+			body.Error = err.Error()
+		}
+	}
+	u.ServeJSON()
 }
 
 // @Title Delete

@@ -20,12 +20,16 @@ func (bll *TaskBLL) GetTaskDetail(id string) (t *types.Task_Get, err error) {
 	t, err = (&dals.TaskDAL{}).GetTaskDetail(id)
 	return
 }
-func (bll *TaskBLL) AddTask(taskPost types.Task_Post) (s map[string]string, err error) {
-	s, err = (&dals.TaskDAL{}).AddTask(taskPost)
+func (bll *TaskBLL) AddTask(taskPost types.Task_Post) (err error) {
+	err = (&dals.TaskDAL{}).AddTask(taskPost)
 	return
 }
 
 func (bll *TaskBLL) DeleteTask(id string, user types.UserInfo_Get) (err error) {
 	err = (&dals.TaskDAL{}).DeleteTask(id, user)
+	return
+}
+func (bll *TaskBLL) UpdateTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).UpdateTask(id, task, user)
 	return
 }
