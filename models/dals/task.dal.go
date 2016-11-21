@@ -200,7 +200,17 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (err error) {
 	task.ID = &id
 	now := time.Now()
 	task.CreatedTime = &now
-	status := "新建"
+	var status string
+	if task.PrimaryOCID == nil {
+		status = "新建"
+	} else if task.PrimaryOCID != nil && task.PrimaryExecutorID == nil {
+		status = "分配中"
+	} else if task.PrimaryExecutorID != nil && task.PlanningBeginDate == nil {
+		status = "计划中"
+	} else if task.PlanningBeginDate != nil && task.PlanningEndDate != nil && task.RealBeginDate == nil && task.RealEndDate == nil {
+		status = "未开始"
+	}
+
 	task.Status = &status
 	percent := 0
 	task.Percent = &percent
@@ -355,9 +365,6 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post, user types.UserInfo_G
 	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
 	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
 
-	if task.RequiringBeginDate != nil {
-		m["requiringBeginDate"] = *task.RequiringBeginDate
-	}
 	if task.RequiringEndDate != nil {
 		m["requiringEndDate"] = *task.RequiringEndDate
 	}
