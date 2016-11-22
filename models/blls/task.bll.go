@@ -20,8 +20,8 @@ func (bll *TaskBLL) GetTaskDetail(id string) (t *types.Task_Get, err error) {
 	t, err = (&dals.TaskDAL{}).GetTaskDetail(id)
 	return
 }
-func (bll *TaskBLL) AddTask(taskPost types.Task_Post) (err error) {
-	err = (&dals.TaskDAL{}).AddTask(taskPost)
+func (bll *TaskBLL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).AddTask(taskPost, user)
 	return
 }
 

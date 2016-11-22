@@ -22,7 +22,7 @@ type TaskController struct {
 func (u *TaskController) Post() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -33,7 +33,7 @@ func (u *TaskController) Post() {
 
 	var task types.Task_Post
 	json.Unmarshal(u.Ctx.Input.RequestBody, &task)
-	err = (&blls.TaskBLL{}).AddTask(task)
+	err = (&blls.TaskBLL{}).AddTask(task, user)
 	if err != nil {
 		body.Error = err.Error()
 	} else {

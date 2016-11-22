@@ -165,7 +165,7 @@ func (dal *TaskDAL) GetTaskDetail(id string) (taskGet *types.Task_Get, err error
 }
 
 // AddTask 定义
-func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (err error) {
+func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -173,6 +173,23 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (err error) {
 	defer dal.mongo.CloseSession()
 	task := new(types.Task)
 	common.StructDeepCopy(taskPost, task)
+	if !user.CheckPermissions(1, 11, 19, 21, 29) {
+		task.PlanningBeginDate = nil
+		task.PlanningEndDate = nil
+	} else if !user.CheckPermissions(99) {
+		task.PrimaryExecutorObjectID = nil
+		task.PrimaryExecutorID = nil
+		task.OtherExecutorObjectIds = nil
+		task.OtherExecutorIDs = nil
+		task.PrimaryOCObjectID = nil
+		task.PrimaryOCID = nil
+	}
+
+	task.RealBeginDate = nil
+	task.RealEndDate = nil
+	task.Percent = nil
+	task.Status = nil
+
 	task.OID = bson.NewObjectId()
 	dal.mongo.UseDB("local")
 
@@ -244,7 +261,7 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post) (err error) {
 	}
 	err = dal.mongo.Collection.Insert(task)
 	if err != nil && strings.Contains(err.Error(), "E11000 duplicate key error collection:") {
-		return dal.AddTask(taskPost)
+		return dal.AddTask(taskPost, user)
 	} else if err != nil {
 		return
 	}
@@ -298,6 +315,38 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	if err != nil {
 		return
 	}
+
+	if !user.CheckPermissions(1) {
+	} else if !user.CheckPermissions(11, 21) {
+	} else if !user.CheckPermissions(19, 29) {
+		task.PlanningBeginDate = nil
+		task.PlanningEndDate = nil
+		task.RealBeginDate = nil
+		task.RealEndDate = nil
+		task.Percent = nil
+	} else if !user.CheckPermissions(99) {
+		task.PrimaryExecutorObjectID = nil
+		task.PrimaryExecutorID = nil
+		task.OtherExecutorObjectIds = nil
+		task.OtherExecutorIDs = nil
+		task.PrimaryOCObjectID = nil
+		task.PrimaryOCID = nil
+	}
+	if task.Status != nil {
+		err = errors.New("不允许修改任务状态。")
+	}
+	status := ""
+	if task.PrimaryOCID == nil {
+		status = "新建"
+	} else if task.PrimaryOCID != nil && task.PrimaryExecutorID == nil {
+		status = "分配中"
+	} else if task.PrimaryExecutorID != nil && task.PlanningBeginDate == nil {
+		status = "计划中"
+	} else if task.PlanningBeginDate != nil && task.PlanningEndDate != nil && task.RealBeginDate == nil && task.RealEndDate == nil {
+		status = "未开始"
+	}
+	task.Status = &status
+
 	m, err1 := dal.setUpdateBsonMap(task, user)
 	if err1 != nil {
 		err = err1
