@@ -87,14 +87,16 @@ func (dal *TaskDAL) GetTaskCount() (counts map[string]int, err error) {
 	}
 	counts["notStarted"] = notStartedCount
 	// 进行中任务数
-	onGoingCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": time.Now()}}).Count()
+	now := time.Now()
+	date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	onGoingCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": date}}).Count()
 	if err1 != nil {
 		err = err1
 		return
 	}
 	counts["onGoing"] = onGoingCount
 	// 超时任务数
-	overtimeCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$gt": time.Now()}}).Count()
+	overtimeCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$gt": date}}).Count()
 	if err1 != nil {
 		err = err1
 		return
@@ -305,17 +307,6 @@ func (dal *TaskDAL) DeleteTask(id string, user types.UserInfo_Get) (err error) {
 
 // UpdateTask 定义
 func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
-	dal.mongo, err = common.GetMongoSession()
-	if err != nil {
-		return
-	}
-	defer dal.mongo.CloseSession()
-	dal.mongo.UseDB("local")
-	err = dal.mongo.UseCollection("T_Tasks")
-	if err != nil {
-		return
-	}
-
 	if !user.CheckPermissions(1) {
 	} else if !user.CheckPermissions(11, 21) {
 	} else if !user.CheckPermissions(19, 29) {
@@ -347,7 +338,17 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	}
 	task.Status = &status
 
-	m, err1 := dal.setUpdateBsonMap(task, user)
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+	m, err1 := dal.setUpdateBsonMap(task)
 	if err1 != nil {
 		err = err1
 		return
@@ -360,7 +361,7 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 
 	return
 }
-func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post, user types.UserInfo_Get) (m map[string]interface{}, err error) {
+func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interface{}, err error) {
 	m = make(map[string]interface{})
 
 	if task.Name != nil {
@@ -462,4 +463,255 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post, user types.UserInfo_G
 		return
 	}
 	return m, err
+}
+
+func (dal *TaskDAL) StartTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	if !user.CheckPermissions(1, 11, 19, 21, 29) {
+		err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+		return
+	}
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	srcTask := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	if err != nil {
+		return
+	}
+	if !user.CheckPermissions(1, 11, 21) {
+		if *srcTask.PrimaryExecutorID != *user.EmpID {
+			err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+			return
+		}
+	}
+	if *srcTask.Status != "未开始" && !(srcTask.PlanningBeginDate != nil && srcTask.PlanningEndDate != nil) {
+		err = errors.New("当前任务状态有误，开始任务失败。")
+		return
+	}
+	desTask := new(types.Task)
+	desTask.RealBeginDate = task.RealBeginDate
+	percent := 0
+	status := "进行中"
+	desTask.Percent = &percent
+	desTask.Status = &status
+
+	m, err1 := dal.setUpdateBsonMap(task)
+	if err1 != nil {
+		err = err1
+		return
+	}
+	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
+	if err != nil {
+		return
+	}
+	sentTime := time.Now()
+	content := "开始任务。"
+	c := types.Communication_Post{
+		RelevantID: srcTask.ID,
+		PersonID:   user.EmpID,
+		SentTime:   &sentTime,
+		Content:    &content,
+	}
+	_, err = (&CommunicationDAL{}).AddCommunication(c)
+	return
+}
+func (dal *TaskDAL) ProgressTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	if !user.CheckPermissions(1, 11, 19, 21, 29) {
+		err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+		return
+	}
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	srcTask := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	if err != nil {
+		return
+	}
+	if !user.CheckPermissions(1, 11, 21) {
+		if *srcTask.PrimaryExecutorID != *user.EmpID {
+			err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+			return
+		}
+	}
+	if *srcTask.Status != "进行中" && !(srcTask.PlanningBeginDate != nil && srcTask.PlanningEndDate != nil) && !(srcTask.RealBeginDate != nil && srcTask.RealEndDate == nil) {
+		err = errors.New("当前任务状态有误，开始任务失败。")
+		return
+	}
+	if *task.Percent < 0 || *task.Percent > 100 {
+		err = errors.New("输入任务进度值有误。")
+		return
+	}
+	desTask := new(types.Task)
+	status := "进行中"
+	if *task.Percent == 100 {
+		status = "已完成"
+		now := time.Now()
+		date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+		desTask.RealEndDate = &date
+	}
+	desTask.Percent = task.Percent
+	desTask.Status = &status
+
+	m, err1 := dal.setUpdateBsonMap(task)
+	if err1 != nil {
+		err = err1
+		return
+	}
+	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
+	if err != nil {
+		return
+	}
+	sentTime := time.Now()
+	content := fmt.Sprintf("填写任务进度，当前任务进度：%d%%", *task.Percent)
+	c := types.Communication_Post{
+		RelevantID: srcTask.ID,
+		PersonID:   user.EmpID,
+		SentTime:   &sentTime,
+		Content:    &content,
+	}
+	_, err = (&CommunicationDAL{}).AddCommunication(c)
+	return
+}
+func (dal *TaskDAL) FinishTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	if !user.CheckPermissions(1, 11, 19, 21, 29) {
+		err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+		return
+	}
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	srcTask := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	if err != nil {
+		return
+	}
+	if !user.CheckPermissions(1, 11, 21) {
+		if *srcTask.PrimaryExecutorID != *user.EmpID {
+			err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+			return
+		}
+	}
+	if *srcTask.Status != "进行中" && !(srcTask.PlanningBeginDate != nil && srcTask.PlanningEndDate != nil) && !(srcTask.RealBeginDate != nil && srcTask.RealEndDate == nil) {
+		err = errors.New("当前任务状态有误，开始任务失败。")
+		return
+	}
+	desTask := new(types.Task)
+	status := "已完成"
+	percent := 100
+	now := time.Now()
+	date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	desTask.RealEndDate = &date
+	desTask.Percent = &percent
+	desTask.Status = &status
+
+	m, err1 := dal.setUpdateBsonMap(task)
+	if err1 != nil {
+		err = err1
+		return
+	}
+	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
+	if err != nil {
+		return
+	}
+	sentTime := time.Now()
+	content := "完成任务"
+	c := types.Communication_Post{
+		RelevantID: srcTask.ID,
+		PersonID:   user.EmpID,
+		SentTime:   &sentTime,
+		Content:    &content,
+	}
+	_, err = (&CommunicationDAL{}).AddCommunication(c)
+	return
+}
+func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	srcTask := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	if err != nil {
+		return
+	}
+	if !user.CheckPermissions(1, 11, 21, 98, 99) {
+		if *srcTask.Status == "新建" || *srcTask.Status == "分配中" {
+			if *srcTask.CreatorID != *user.EmpID {
+				err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+				return
+			}
+		} else {
+			err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+			return
+		}
+	}
+	if user.CheckPermissions(98) {
+		if *srcTask.Status == "新建" || *srcTask.Status == "分配中" {
+			if !(*srcTask.CreatorID == *user.EmpID || *srcTask.PrimarySellerID == *user.EmpID) {
+				err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+				return
+			}
+		} else {
+			if *srcTask.PrimarySellerID != *user.EmpID {
+				err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+				return
+			}
+		}
+	}
+
+	desTask := new(types.Task)
+	status := "已关闭"
+	desTask.Status = &status
+
+	m, err1 := dal.setUpdateBsonMap(task)
+	if err1 != nil {
+		err = err1
+		return
+	}
+	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
+	if err != nil {
+		return
+	}
+	sentTime := time.Now()
+	content := "关闭任务"
+	c := types.Communication_Post{
+		RelevantID: srcTask.ID,
+		PersonID:   user.EmpID,
+		SentTime:   &sentTime,
+		Content:    &content,
+	}
+	_, err = (&CommunicationDAL{}).AddCommunication(c)
+	return
 }

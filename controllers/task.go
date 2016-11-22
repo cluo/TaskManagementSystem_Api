@@ -161,6 +161,134 @@ func (u *TaskController) Put() {
 	u.ServeJSON()
 }
 
+// @Title Start
+// @Description update the task
+// @Param	tid		path 	string	true		"The tid you want to update"
+// @Param	body		body 	types.Task_Post	true		"body for task content"
+// @Success 200 {string} update success!
+// @router /:tid/start [put]
+func (u *TaskController) Start() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	if tid != "" {
+		var task types.Task_Post
+		json.Unmarshal(u.Ctx.Input.RequestBody, &task)
+		err = (&blls.TaskBLL{}).StartTask(tid, task, user)
+		if err == nil {
+			body.Data = "update success!"
+		} else {
+			body.Error = err.Error()
+		}
+	}
+	u.ServeJSON()
+}
+
+// @Title Finish
+// @Description update the task
+// @Param	tid		path 	string	true		"The tid you want to update"
+// @Param	body		body 	types.Task_Post	true		"body for task content"
+// @Success 200 {string} update success!
+// @router /:tid/finish [put]
+func (u *TaskController) Finish() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	if tid != "" {
+		var task types.Task_Post
+		json.Unmarshal(u.Ctx.Input.RequestBody, &task)
+		err = (&blls.TaskBLL{}).FinishTask(tid, task, user)
+		if err == nil {
+			body.Data = "update success!"
+		} else {
+			body.Error = err.Error()
+		}
+	}
+	u.ServeJSON()
+}
+
+// @Title Progress
+// @Description update the task
+// @Param	tid		path 	string	true		"The tid you want to update"
+// @Param	body		body 	types.Task_Post	true		"body for task content"
+// @Success 200 {string} update success!
+// @router /:tid/progress [put]
+func (u *TaskController) Progress() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	if tid != "" {
+		var task types.Task_Post
+		json.Unmarshal(u.Ctx.Input.RequestBody, &task)
+		err = (&blls.TaskBLL{}).ProgressTask(tid, task, user)
+		if err == nil {
+			body.Data = "update success!"
+		} else {
+			body.Error = err.Error()
+		}
+	}
+	u.ServeJSON()
+}
+
+// @Title Close
+// @Description update the task
+// @Param	tid		path 	string	true		"The tid you want to update"
+// @Param	body		body 	types.Task_Post	true		"body for task content"
+// @Success 200 {string} update success!
+// @router /:tid/close [put]
+func (u *TaskController) Close() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	tid := u.GetString(":tid")
+	if tid != "" {
+		var task types.Task_Post
+		json.Unmarshal(u.Ctx.Input.RequestBody, &task)
+		err = (&blls.TaskBLL{}).CloseTask(tid, task, user)
+		if err == nil {
+			body.Data = "update success!"
+		} else {
+			body.Error = err.Error()
+		}
+	}
+	u.ServeJSON()
+}
+
 // @Title Delete
 // @Description delete the task
 // @Param	tid		path 	string	true		"The tid you want to delete"

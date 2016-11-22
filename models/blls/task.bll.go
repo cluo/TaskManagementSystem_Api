@@ -33,3 +33,19 @@ func (bll *TaskBLL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	err = (&dals.TaskDAL{}).UpdateTask(id, task, user)
 	return
 }
+func (bll *TaskBLL) StartTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).StartTask(id, task, user)
+	return
+}
+func (bll *TaskBLL) ProgressTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).ProgressTask(id, task, user)
+	return
+}
+func (bll *TaskBLL) FinishTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).FinishTask(id, task, user)
+	return
+}
+func (bll *TaskBLL) CloseTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).CloseTask(id, task, user)
+	return
+}
