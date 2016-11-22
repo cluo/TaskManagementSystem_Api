@@ -496,14 +496,14 @@ func (dal *TaskDAL) StartTask(id string, task types.Task_Post, user types.UserIn
 		err = errors.New("当前任务状态有误，开始任务失败。")
 		return
 	}
-	desTask := new(types.Task)
+	desTask := new(types.Task_Post)
 	desTask.RealBeginDate = task.RealBeginDate
 	percent := 0
 	status := "进行中"
 	desTask.Percent = &percent
 	desTask.Status = &status
 
-	m, err1 := dal.setUpdateBsonMap(task)
+	m, err1 := dal.setUpdateBsonMap(*desTask)
 	if err1 != nil {
 		err = err1
 		return
@@ -558,7 +558,7 @@ func (dal *TaskDAL) ProgressTask(id string, task types.Task_Post, user types.Use
 		err = errors.New("输入任务进度值有误。")
 		return
 	}
-	desTask := new(types.Task)
+	desTask := new(types.Task_Post)
 	status := "进行中"
 	if *task.Percent == 100 {
 		status = "已完成"
@@ -569,7 +569,7 @@ func (dal *TaskDAL) ProgressTask(id string, task types.Task_Post, user types.Use
 	desTask.Percent = task.Percent
 	desTask.Status = &status
 
-	m, err1 := dal.setUpdateBsonMap(task)
+	m, err1 := dal.setUpdateBsonMap(*desTask)
 	if err1 != nil {
 		err = err1
 		return
@@ -620,7 +620,7 @@ func (dal *TaskDAL) FinishTask(id string, task types.Task_Post, user types.UserI
 		err = errors.New("当前任务状态有误，开始任务失败。")
 		return
 	}
-	desTask := new(types.Task)
+	desTask := new(types.Task_Post)
 	status := "已完成"
 	percent := 100
 	now := time.Now()
@@ -629,7 +629,7 @@ func (dal *TaskDAL) FinishTask(id string, task types.Task_Post, user types.UserI
 	desTask.Percent = &percent
 	desTask.Status = &status
 
-	m, err1 := dal.setUpdateBsonMap(task)
+	m, err1 := dal.setUpdateBsonMap(*desTask)
 	if err1 != nil {
 		err = err1
 		return
@@ -691,11 +691,11 @@ func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserIn
 		}
 	}
 
-	desTask := new(types.Task)
+	desTask := new(types.Task_Post)
 	status := "已关闭"
 	desTask.Status = &status
 
-	m, err1 := dal.setUpdateBsonMap(task)
+	m, err1 := dal.setUpdateBsonMap(*desTask)
 	if err1 != nil {
 		err = err1
 		return
