@@ -228,6 +228,10 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 		status = "计划中"
 	} else if task.PlanningBeginDate != nil && task.PlanningEndDate != nil && task.RealBeginDate == nil && task.RealEndDate == nil {
 		status = "未开始"
+	} else if task.RealBeginDate == nil && task.RealEndDate != nil {
+		status = "进行中"
+	} else if task.RealBeginDate != nil && task.RealEndDate != nil {
+		status = "完成"
 	}
 
 	task.Status = &status
@@ -325,18 +329,8 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	}
 	if task.Status != nil {
 		err = errors.New("不允许修改任务状态。")
+		return
 	}
-	status := ""
-	if task.PrimaryOCID == nil {
-		status = "新建"
-	} else if task.PrimaryOCID != nil && task.PrimaryExecutorID == nil {
-		status = "分配中"
-	} else if task.PrimaryExecutorID != nil && task.PlanningBeginDate == nil {
-		status = "计划中"
-	} else if task.PlanningBeginDate != nil && task.PlanningEndDate != nil && task.RealBeginDate == nil && task.RealEndDate == nil {
-		status = "未开始"
-	}
-	task.Status = &status
 
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
@@ -348,6 +342,28 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	if err != nil {
 		return
 	}
+	srcTask := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(srcTask)
+	if err != nil {
+		return
+	}
+
+	status := ""
+	if srcTask.PrimaryOCID == nil && task.PrimaryOCID == nil {
+		status = "新建"
+	} else if (srcTask.PrimaryOCID != nil || task.PrimaryOCID != nil) && (srcTask.PrimaryExecutorID == nil && task.PrimaryExecutorID == nil) {
+		status = "分配中"
+	} else if (srcTask.PrimaryExecutorID != nil || task.PrimaryExecutorID != nil) && (srcTask.PlanningBeginDate == nil && task.PlanningBeginDate == nil) {
+		status = "计划中"
+	} else if (srcTask.PlanningEndDate != nil || task.PlanningEndDate != nil) && (srcTask.RealBeginDate == nil && task.RealBeginDate == nil) {
+		status = "未开始"
+	} else if (srcTask.RealBeginDate != nil || task.RealBeginDate != nil) && (srcTask.RealEndDate == nil && task.RealEndDate == nil) {
+		status = "进行中"
+	} else if (srcTask.RealBeginDate != nil || task.RealBeginDate != nil) && (srcTask.RealEndDate != nil || task.RealEndDate != nil) {
+		status = "完成"
+	}
+	task.Status = &status
+
 	m, err1 := dal.setUpdateBsonMap(task)
 	if err1 != nil {
 		err = err1
@@ -482,7 +498,7 @@ func (dal *TaskDAL) StartTask(id string, task types.Task_Post, user types.UserIn
 	}
 
 	srcTask := new(types.Task)
-	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(srcTask)
 	if err != nil {
 		return
 	}
@@ -540,7 +556,7 @@ func (dal *TaskDAL) ProgressTask(id string, task types.Task_Post, user types.Use
 	}
 
 	srcTask := new(types.Task)
-	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(srcTask)
 	if err != nil {
 		return
 	}
@@ -606,7 +622,7 @@ func (dal *TaskDAL) FinishTask(id string, task types.Task_Post, user types.UserI
 	}
 
 	srcTask := new(types.Task)
-	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(srcTask)
 	if err != nil {
 		return
 	}
@@ -662,7 +678,7 @@ func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserIn
 	}
 
 	srcTask := new(types.Task)
-	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(srcTask)
 	if err != nil {
 		return
 	}

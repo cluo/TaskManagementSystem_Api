@@ -157,6 +157,7 @@ func (u *TaskController) Put() {
 		} else {
 			body.Error = err.Error()
 		}
+		u.Data["json"] = body
 	}
 	u.ServeJSON()
 }
@@ -189,6 +190,7 @@ func (u *TaskController) Start() {
 		} else {
 			body.Error = err.Error()
 		}
+		u.Data["json"] = body
 	}
 	u.ServeJSON()
 }
@@ -221,6 +223,7 @@ func (u *TaskController) Finish() {
 		} else {
 			body.Error = err.Error()
 		}
+		u.Data["json"] = body
 	}
 	u.ServeJSON()
 }
@@ -253,6 +256,7 @@ func (u *TaskController) Progress() {
 		} else {
 			body.Error = err.Error()
 		}
+		u.Data["json"] = body
 	}
 	u.ServeJSON()
 }
@@ -285,6 +289,7 @@ func (u *TaskController) Close() {
 		} else {
 			body.Error = err.Error()
 		}
+		u.Data["json"] = body
 	}
 	u.ServeJSON()
 }
