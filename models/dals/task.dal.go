@@ -400,10 +400,10 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 		err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": *task.PrimarySellerID}).One(&objectID)
 		if err1 == nil && objectID.Oid != nil {
 			m["primarySellerId"] = *task.PrimarySellerID
-			m["PrimarySellerObjectID"] = *objectID.Oid
+			m["primarySellerObjectId"] = *objectID.Oid
 		} else {
 			m["primarySellerId"] = nil
-			m["PrimarySellerObjectID"] = nil
+			m["primarySellerObjectId"] = nil
 		}
 	}
 	if task.PrimaryOCID != nil {
