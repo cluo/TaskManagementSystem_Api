@@ -9,7 +9,6 @@ import (
 type TaskHeader struct {
 	ID                      *string        `bson:"id"`
 	Name                    *string        `bson:"name"`
-	Resume                  *string        `bson:"resume"`
 	PlanningBeginDate       *time.Time     `bson:"planningBeginDate"`
 	PlanningEndDate         *time.Time     `bson:"planningEndDate"`
 	RealBeginDate           *time.Time     `bson:"realBeginDate"`
@@ -25,7 +24,6 @@ type Task struct {
 	OID                     bson.ObjectId   `bson:"_id"`
 	ID                      *string         `bson:"id"`
 	Name                    *string         `bson:"name" `
-	Resume                  *string         `bson:"resume" `
 	Description             *string         `bson:"description" `
 	CustomerContact         *string         `bson:"customerContact" `
 	CreatedTime             *time.Time      `bson:"createdTime"`
@@ -68,7 +66,6 @@ type MaxID struct {
 type TaskHeader_Get struct {
 	ID                *string    `json:"id"`
 	Name              *string    `json:"name"`
-	Resume            *string    `json:"resume"`
 	PlanningBeginDate *time.Time `json:"planningBeginDate"`
 	PlanningEndDate   *time.Time `json:"planningEndDate"`
 	RealBeginDate     *time.Time `json:"realBeginDate"`
@@ -82,7 +79,6 @@ type TaskHeader_Get struct {
 type Task_Get struct {
 	ID                *string    `json:"id"`
 	Name              *string    `json:"name"`
-	Resume            *string    `json:"resume"`
 	Description       *string    `json:"description"`
 	CustomerContact   *string    `json:"customerContact"`
 	CreatedTime       *time.Time `json:"createdTime"`
@@ -111,7 +107,6 @@ type Task_Get struct {
 
 type Task_Post struct {
 	Name                    *string         `json:"name" `
-	Resume                  *string         `json:"resume" `
 	Description             *string         `json:"description" `
 	CustomerContact         *string         `json:"customerContact" `
 	CreatedTime             *time.Time      `json:"createdTime"`

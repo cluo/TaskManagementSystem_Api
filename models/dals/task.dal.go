@@ -383,9 +383,6 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 	if task.Name != nil {
 		m["name"] = *task.Name
 	}
-	if task.Resume != nil {
-		m["resume"] = *task.Resume
-	}
 	if task.Description != nil {
 		m["description"] = *task.Description
 	}
