@@ -682,6 +682,11 @@ func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserIn
 	if err != nil {
 		return
 	}
+
+	if *srcTask.Status == "已关闭" {
+		return
+	}
+
 	if !user.CheckPermissions(1, 11, 21, 98, 99) {
 		if *srcTask.Status == "新建" || *srcTask.Status == "分配中" {
 			if *srcTask.CreatorID != *user.EmpID {
