@@ -21,33 +21,34 @@ type TaskHeader struct {
 }
 
 type Task struct {
-	OID                     bson.ObjectId   `bson:"_id"`
-	ID                      *string         `bson:"id"`
-	Name                    *string         `bson:"name" `
-	Description             *string         `bson:"description" `
-	CustomerContact         *string         `bson:"customerContact" `
-	CreatedTime             *time.Time      `bson:"createdTime"`
-	CreatorObjectID         *bson.ObjectId  `bson:"creatorObjectId"`
-	CreatorID               *string         `bson:"creatorId"`
-	PrimarySellerObjectID   *bson.ObjectId  `bson:"primarySellerObjectId"`
-	PrimarySellerID         *string         `bson:"primarySellerId"`
-	PrimaryOCObjectID       *bson.ObjectId  `bson:"primaryOCObjectId"`
-	PrimaryOCID             *string         `bson:"primaryOCId"`
-	PrimaryExecutorObjectID *bson.ObjectId  `bson:"primaryExecutorObjectId"`
-	PrimaryExecutorID       *string         `bson:"primaryExecutorId"`
-	OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
-	OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
-	RequiringEndDate        *time.Time      `bson:"requiringEndDate"`
-	PlanningBeginDate       *time.Time      `bson:"planningBeginDate" `
-	PlanningEndDate         *time.Time      `bson:"planningEndDate" `
-	RealBeginDate           *time.Time      `bson:"realBeginDate" `
-	RealEndDate             *time.Time      `bson:"realEndDate" `
-	Percent                 *int            `bson:"percent"`
-	Status                  *string         `bson:"status"`
-	ParentProductObjectID   *bson.ObjectId  `bson:"parentProductObjectId" `
-	ParentProductID         *string         `bson:"parentProductId"`
-	ParentProjectObjectID   *bson.ObjectId  `bson:"parentProjectObjectId" `
-	ParentProjectID         *string         `bson:"parentProjectId"`
+	OID                     bson.ObjectId  `bson:"_id"`
+	ID                      *string        `bson:"id"`
+	Name                    *string        `bson:"name" `
+	Description             *string        `bson:"description" `
+	CustomerContact         *string        `bson:"customerContact" `
+	CreatedTime             *time.Time     `bson:"createdTime"`
+	CreatorObjectID         *bson.ObjectId `bson:"creatorObjectId"`
+	CreatorID               *string        `bson:"creatorId"`
+	PrimarySellerObjectID   *bson.ObjectId `bson:"primarySellerObjectId"`
+	PrimarySellerID         *string        `bson:"primarySellerId"`
+	PrimaryOCObjectID       *bson.ObjectId `bson:"primaryOCObjectId"`
+	PrimaryOCID             *string        `bson:"primaryOCId"`
+	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
+	PrimaryExecutorID       *string        `bson:"primaryExecutorId"`
+	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
+	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
+	OtherExecutors        *string        `bson:"otherExecutors"`
+	RequiringEndDate      *time.Time     `bson:"requiringEndDate"`
+	PlanningBeginDate     *time.Time     `bson:"planningBeginDate" `
+	PlanningEndDate       *time.Time     `bson:"planningEndDate" `
+	RealBeginDate         *time.Time     `bson:"realBeginDate" `
+	RealEndDate           *time.Time     `bson:"realEndDate" `
+	Percent               *int           `bson:"percent"`
+	Status                *string        `bson:"status"`
+	ParentProductObjectID *bson.ObjectId `bson:"parentProductObjectId" `
+	ParentProductID       *string        `bson:"parentProductId"`
+	ParentProjectObjectID *bson.ObjectId `bson:"parentProjectObjectId" `
+	ParentProjectID       *string        `bson:"parentProjectId"`
 }
 type EmployeeName struct {
 	Name *string `bson:"name"`
@@ -90,8 +91,8 @@ type Task_Get struct {
 	PrimaryOC         *string    `json:"primaryOC"`
 	PrimaryExecutorID *string    `json:"primaryExecutorId"`
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
-	OtherExecutorIds  []string   `json:"otherExecutorIds"`
-	OtherExecutors    []string   `json:"otherExecutors"`
+	// OtherExecutorIds  []string   `json:"otherExecutorIds"`
+	OtherExecutors    *string    `json:"otherExecutors"`
 	RequiringEndDate  *time.Time `json:"requiringEndDate"`
 	PlanningBeginDate *time.Time `json:"planningBeginDate"`
 	PlanningEndDate   *time.Time `json:"planningEndDate"`
@@ -106,29 +107,30 @@ type Task_Get struct {
 }
 
 type Task_Post struct {
-	Name                    *string         `json:"name" `
-	Description             *string         `json:"description" `
-	CustomerContact         *string         `json:"customerContact" `
-	CreatedTime             *time.Time      `json:"createdTime"`
-	CreatorObjectID         *bson.ObjectId  `json:"creatorObjectId"`
-	CreatorID               *string         `json:"creatorId"`
-	PrimarySellerObjectID   *bson.ObjectId  `json:"primarySellerObjectId"`
-	PrimarySellerID         *string         `json:"primarySellerId"`
-	PrimaryOCObjectID       *bson.ObjectId  `json:"primaryOCObjectId"`
-	PrimaryOCID             *string         `json:"primaryOCId"`
-	PrimaryExecutorObjectID *bson.ObjectId  `json:"primaryExecutorObjectId"`
-	PrimaryExecutorID       *string         `json:"primaryExecutorId"`
-	OtherExecutorObjectIds  []bson.ObjectId `json:"otherExecutorObjectIds"`
-	OtherExecutorIDs        []string        `json:"otherExecutorIds"`
-	RequiringEndDate        *time.Time      `json:"requiringEndDate"`
-	PlanningBeginDate       *time.Time      `json:"planningBeginDate" `
-	PlanningEndDate         *time.Time      `json:"planningEndDate" `
-	RealBeginDate           *time.Time      `json:"realBeginDate" `
-	RealEndDate             *time.Time      `json:"realEndDate" `
-	Percent                 *int            `json:"percent"`
-	Status                  *string         `json:"status"`
-	ParentProductObjectID   *bson.ObjectId  `json:"parentProductObjectId" `
-	ParentProductID         *string         `json:"parentProductId"`
-	ParentProjectObjectID   *bson.ObjectId  `json:"parentProjectObjectId" `
-	ParentProjectID         *string         `json:"parentProjectId"`
+	Name                    *string        `json:"name" `
+	Description             *string        `json:"description" `
+	CustomerContact         *string        `json:"customerContact" `
+	CreatedTime             *time.Time     `json:"createdTime"`
+	CreatorObjectID         *bson.ObjectId `json:"creatorObjectId"`
+	CreatorID               *string        `json:"creatorId"`
+	PrimarySellerObjectID   *bson.ObjectId `json:"primarySellerObjectId"`
+	PrimarySellerID         *string        `json:"primarySellerId"`
+	PrimaryOCObjectID       *bson.ObjectId `json:"primaryOCObjectId"`
+	PrimaryOCID             *string        `json:"primaryOCId"`
+	PrimaryExecutorObjectID *bson.ObjectId `json:"primaryExecutorObjectId"`
+	PrimaryExecutorID       *string        `json:"primaryExecutorId"`
+	// OtherExecutorObjectIds  []bson.ObjectId `json:"otherExecutorObjectIds"`
+	// OtherExecutorIDs        []string        `json:"otherExecutorIds"`
+	OtherExecutors        *string        `json:"otherExecutors"`
+	RequiringEndDate      *time.Time     `json:"requiringEndDate"`
+	PlanningBeginDate     *time.Time     `json:"planningBeginDate" `
+	PlanningEndDate       *time.Time     `json:"planningEndDate" `
+	RealBeginDate         *time.Time     `json:"realBeginDate" `
+	RealEndDate           *time.Time     `json:"realEndDate" `
+	Percent               *int           `json:"percent"`
+	Status                *string        `json:"status"`
+	ParentProductObjectID *bson.ObjectId `json:"parentProductObjectId" `
+	ParentProductID       *string        `json:"parentProductId"`
+	ParentProjectObjectID *bson.ObjectId `json:"parentProjectObjectId" `
+	ParentProjectID       *string        `json:"parentProjectId"`
 }

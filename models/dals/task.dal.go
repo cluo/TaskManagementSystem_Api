@@ -143,15 +143,15 @@ func (dal *TaskDAL) GetTaskDetail(id string) (taskGet *types.Task_Get, err error
 	if err1 == nil {
 		taskGet.PrimaryOC = emp.Name
 	}
-	otherExecutorsCount := len(task.OtherExecutorObjectIds)
-	taskGet.OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
-	for index, value := range task.OtherExecutorObjectIds {
-		emp = new(types.EmployeeName)
-		err1 = dal.mongo.Db.C("M_Employees").FindId(value).One(&emp)
-		if err1 == nil {
-			taskGet.OtherExecutors[index] = *emp.Name
-		}
-	}
+	// otherExecutorsCount := len(task.OtherExecutorObjectIds)
+	// taskGet.OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
+	// for index, value := range task.OtherExecutorObjectIds {
+	// 	emp = new(types.EmployeeName)
+	// 	err1 = dal.mongo.Db.C("M_Employees").FindId(value).One(&emp)
+	// 	if err1 == nil {
+	// 		taskGet.OtherExecutors[index] = *emp.Name
+	// 	}
+	// }
 
 	product := new(types.ProductName)
 	err1 = dal.mongo.Db.C("T_Products").FindId(task.ParentProductObjectID).One(&emp)
@@ -181,8 +181,9 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 	} else if !user.CheckPermissions(99) {
 		task.PrimaryExecutorObjectID = nil
 		task.PrimaryExecutorID = nil
-		task.OtherExecutorObjectIds = nil
-		task.OtherExecutorIDs = nil
+		// task.OtherExecutorObjectIds = nil
+		// task.OtherExecutorIDs = nil
+		task.OtherExecutors = nil
 		task.PrimaryOCObjectID = nil
 		task.PrimaryOCID = nil
 	}
@@ -322,8 +323,9 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	} else if !user.CheckPermissions(99) {
 		task.PrimaryExecutorObjectID = nil
 		task.PrimaryExecutorID = nil
-		task.OtherExecutorObjectIds = nil
-		task.OtherExecutorIDs = nil
+		// task.OtherExecutorObjectIds = nil
+		// task.OtherExecutorIDs = nil
+		task.OtherExecutors = nil
 		task.PrimaryOCObjectID = nil
 		task.PrimaryOCID = nil
 	}
@@ -425,6 +427,10 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 			m["primaryExecutorObjectId"] = nil
 		}
 	}
+	if task.OtherExecutors != nil {
+		m["otherExecutors"] = *task.OtherExecutors
+	}
+
 	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
 	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
 
