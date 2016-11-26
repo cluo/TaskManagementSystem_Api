@@ -367,15 +367,32 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	task.Status = &status
 
 	m, err1 := dal.setUpdateBsonMap(task)
-	if err1 != nil {
+	if srcTask.RefuseStatus == nil && err1 != nil {
 		err = err1
 		return
+	}
+
+	// 编辑任务后重新激活拒绝的任务
+	if (*srcTask.Status == "新建" || *srcTask.Status == "分配中" || *srcTask.Status == "计划中") && srcTask.RefuseStatus != nil {
+		m["refuseStatus"] = nil
 	}
 
 	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
 	if err != nil {
 		return
 	}
+	if srcTask.RefuseStatus == nil || !(*srcTask.Status == "新建" || *srcTask.Status == "分配中" || *srcTask.Status == "计划中") {
+		return
+	}
+	sentTime := time.Now()
+	content := "重新激活任务。"
+	c := types.Communication_Post{
+		RelevantID: srcTask.ID,
+		PersonID:   user.EmpID,
+		SentTime:   &sentTime,
+		Content:    &content,
+	}
+	_, err = (&CommunicationDAL{}).AddCommunication(c)
 
 	return
 }
@@ -455,7 +472,6 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 	if task.Status != nil {
 		m["status"] = task.Status
 	}
-	m["refuseStatus"] = task.RefuseStatus
 	if task.ParentProductID != nil {
 		objectID := new(types.ObjectID)
 		err1 := dal.mongo.Db.C("T_Products").Find(bson.M{"id": *task.ParentProductID}).One(&objectID)
