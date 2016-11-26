@@ -294,7 +294,7 @@ func (dal *TaskDAL) DeleteTask(id string, user types.UserInfo_Get) (err error) {
 	if err != nil {
 		return
 	}
-	if (*task.Status != "新建" && *task.Status != "未开始") && !user.CheckPermissions(1) {
+	if (*task.Status != "新建" && *task.Status != "未开始" && *task.Status != "分配中") && !user.CheckPermissions(1) {
 		err = errors.New("当前任务已经开始，不能删除当前记录。")
 		return
 	}
