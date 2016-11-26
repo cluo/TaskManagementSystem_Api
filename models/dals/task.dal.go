@@ -383,23 +383,23 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 	m = make(map[string]interface{})
 
 	if task.Name != nil {
-		m["name"] = *task.Name
+		m["name"] = task.Name
 	}
 	if task.Description != nil {
-		m["description"] = *task.Description
+		m["description"] = task.Description
 	}
 	if task.CustomerContact != nil {
-		m["customerContact"] = *task.CustomerContact
+		m["customerContact"] = task.CustomerContact
 	}
 	if task.CreatedTime != nil {
-		m["createdTime"] = *task.CreatedTime
+		m["createdTime"] = task.CreatedTime
 	}
 	if task.PrimarySellerID != nil {
 		objectID := new(types.ObjectID)
 		err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": *task.PrimarySellerID}).One(&objectID)
 		if err1 == nil && objectID.Oid != nil {
-			m["primarySellerId"] = *task.PrimarySellerID
-			m["primarySellerObjectId"] = *objectID.Oid
+			m["primarySellerId"] = task.PrimarySellerID
+			m["primarySellerObjectId"] = objectID.Oid
 		} else {
 			m["primarySellerId"] = nil
 			m["primarySellerObjectId"] = nil
@@ -409,8 +409,8 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 		objectID := new(types.ObjectID)
 		err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": *task.PrimaryOCID}).One(&objectID)
 		if err1 == nil && objectID.Oid != nil {
-			m["primaryOCId"] = *task.PrimaryOCID
-			m["primaryOCObjectId"] = *objectID.Oid
+			m["primaryOCId"] = task.PrimaryOCID
+			m["primaryOCObjectId"] = objectID.Oid
 		} else {
 			m["primaryOCId"] = nil
 			m["primaryOCObjectId"] = nil
@@ -420,8 +420,8 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 		objectID := new(types.ObjectID)
 		err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": *task.PrimaryExecutorID}).One(&objectID)
 		if err1 == nil && objectID.Oid != nil {
-			m["primaryExecutorId"] = *task.PrimaryExecutorID
-			m["primaryExecutorObjectId"] = *objectID.Oid
+			m["primaryExecutorId"] = task.PrimaryExecutorID
+			m["primaryExecutorObjectId"] = objectID.Oid
 		} else {
 			m["primaryExecutorId"] = nil
 			m["primaryExecutorObjectId"] = nil
@@ -435,32 +435,33 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
 
 	if task.RequiringEndDate != nil {
-		m["requiringEndDate"] = *task.RequiringEndDate
+		m["requiringEndDate"] = task.RequiringEndDate
 	}
 	if task.PlanningBeginDate != nil {
-		m["planningBeginDate"] = *task.PlanningBeginDate
+		m["planningBeginDate"] = task.PlanningBeginDate
 	}
 	if task.PlanningEndDate != nil {
-		m["planningEndDate"] = *task.PlanningEndDate
+		m["planningEndDate"] = task.PlanningEndDate
 	}
 	if task.RealBeginDate != nil {
-		m["realBeginDate"] = *task.RealBeginDate
+		m["realBeginDate"] = task.RealBeginDate
 	}
 	if task.RealEndDate != nil {
-		m["realEndDate"] = *task.RealEndDate
+		m["realEndDate"] = task.RealEndDate
 	}
 	if task.Percent != nil {
-		m["percent"] = *task.Percent
+		m["percent"] = task.Percent
 	}
 	if task.Status != nil {
-		m["status"] = *task.Status
+		m["status"] = task.Status
 	}
+	m["refuseStatus"] = task.RefuseStatus
 	if task.ParentProductID != nil {
 		objectID := new(types.ObjectID)
 		err1 := dal.mongo.Db.C("T_Products").Find(bson.M{"id": *task.ParentProductID}).One(&objectID)
 		if err1 == nil && objectID.Oid != nil {
-			m["parentProductId"] = *task.ParentProductID
-			m["parentProductObjectId"] = *objectID.Oid
+			m["parentProductId"] = task.ParentProductID
+			m["parentProductObjectId"] = objectID.Oid
 		} else {
 			m["parentProductId"] = nil
 			m["parentProductObjectId"] = nil
@@ -470,8 +471,8 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 		objectID := new(types.ObjectID)
 		err1 := dal.mongo.Db.C("T_Projects").Find(bson.M{"id": *task.ParentProjectID}).One(&objectID)
 		if err1 == nil && objectID.Oid != nil {
-			m["parentProjectId"] = *task.ParentProjectID
-			m["parentProjectObjectId"] = *objectID.Oid
+			m["parentProjectId"] = task.ParentProjectID
+			m["parentProjectObjectId"] = objectID.Oid
 		} else {
 			m["parentProjectId"] = nil
 			m["parentProjectObjectId"] = nil
@@ -730,6 +731,65 @@ func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserIn
 	}
 	sentTime := time.Now()
 	content := "关闭任务"
+	c := types.Communication_Post{
+		RelevantID: srcTask.ID,
+		PersonID:   user.EmpID,
+		SentTime:   &sentTime,
+		Content:    &content,
+	}
+	_, err = (&CommunicationDAL{}).AddCommunication(c)
+	return
+}
+
+func (dal *TaskDAL) RefuseTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	if !user.CheckPermissions(11, 19, 21, 29, 99) {
+		err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+		return
+	}
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	srcTask := new(types.Task)
+	err = dal.mongo.Collection.Find(bson.M{"id": id}).One(srcTask)
+	if err != nil {
+		return
+	}
+	OCRefuseFlag := (*srcTask.Status == "新建" || *srcTask.Status == "分配中") && user.CheckPermissions(99)
+	taskExecutorRefuseFlag := *srcTask.Status == "计划中" && ((user.CheckPermissions(19, 29) && *srcTask.PrimaryExecutorID == *user.EmpID) || user.CheckPermissions(11, 21))
+	if !(OCRefuseFlag || taskExecutorRefuseFlag) {
+		err = errors.New("请确认，登陆用户没有权限执行开始任务操作。")
+		return
+	}
+
+	desTask := new(types.Task_Post)
+	refuseStatus := ""
+	if OCRefuseFlag {
+		refuseStatus = "OC拒绝"
+	} else if taskExecutorRefuseFlag {
+		refuseStatus = "研发拒绝"
+	}
+
+	desTask.RefuseStatus = &refuseStatus
+
+	m, err1 := dal.setUpdateBsonMap(*desTask)
+	if err1 != nil {
+		err = err1
+		return
+	}
+	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
+	if err != nil {
+		return
+	}
+	sentTime := time.Now()
+	content := "拒绝任务，拒绝原因：" + *task.RefuseReason
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
 		PersonID:   user.EmpID,

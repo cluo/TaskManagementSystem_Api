@@ -14,6 +14,7 @@ type TaskHeader struct {
 	RealBeginDate           *time.Time     `bson:"realBeginDate"`
 	RealEndDate             *time.Time     `bson:"realEndDate"`
 	Status                  *string        `bson:"status"`
+	RefuseStatus            *string        `bson:"refuseStatus"`
 	CreatorID               *string        `bson:"creatorId"`
 	PrimaryExecutorID       *string        `bson:"primaryExecutorId"`
 	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
@@ -45,6 +46,7 @@ type Task struct {
 	RealEndDate           *time.Time     `bson:"realEndDate" `
 	Percent               *int           `bson:"percent"`
 	Status                *string        `bson:"status"`
+	RefuseStatus          *string        `bson:"refuseStatus"`
 	ParentProductObjectID *bson.ObjectId `bson:"parentProductObjectId" `
 	ParentProductID       *string        `bson:"parentProductId"`
 	ParentProjectObjectID *bson.ObjectId `bson:"parentProjectObjectId" `
@@ -72,6 +74,7 @@ type TaskHeader_Get struct {
 	RealBeginDate     *time.Time `json:"realBeginDate"`
 	RealEndDate       *time.Time `json:"realEndDate"`
 	Status            *string    `json:"status"`
+	RefuseStatus      *string    `json:"refuseStatus"`
 	CreatorID         *string    `json:"creatorId"`
 	PrimaryExecutorID *string    `json:"primaryExecutorId"`
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
@@ -100,6 +103,7 @@ type Task_Get struct {
 	RealEndDate       *time.Time `json:"realEndDate"`
 	Percent           *int       `json:"percent"`
 	Status            *string    `json:"status"`
+	RefuseStatus      *string    `json:"refuseStatus"`
 	ParentProductID   *string    `json:"parentProductId"`
 	ParentProduct     *string    `json:"parentProduct"`
 	ParentProjectID   *string    `json:"parentProjectId"`
@@ -129,6 +133,8 @@ type Task_Post struct {
 	RealEndDate           *time.Time     `json:"realEndDate" `
 	Percent               *int           `json:"percent"`
 	Status                *string        `json:"status"`
+	RefuseStatus          *string        `json:"refuseStatus"`
+	RefuseReason          *string        `json:"refuseReason"`
 	ParentProductObjectID *bson.ObjectId `json:"parentProductObjectId" `
 	ParentProductID       *string        `json:"parentProductId"`
 	ParentProjectObjectID *bson.ObjectId `json:"parentProjectObjectId" `

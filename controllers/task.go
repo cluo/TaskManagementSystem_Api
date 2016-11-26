@@ -173,6 +173,9 @@ func (u *TaskController) Put() {
 		case "close":
 			err = (&blls.TaskBLL{}).CloseTask(tid, task, user)
 			break
+		case "refuse":
+			err = (&blls.TaskBLL{}).RefuseTask(tid, task, user)
+			break
 		default:
 			err = errors.New("method参数错误，该操作不存在。")
 		}

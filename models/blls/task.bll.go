@@ -49,3 +49,7 @@ func (bll *TaskBLL) CloseTask(id string, task types.Task_Post, user types.UserIn
 	err = (&dals.TaskDAL{}).CloseTask(id, task, user)
 	return
 }
+func (bll *TaskBLL) RefuseTask(id string, task types.Task_Post, user types.UserInfo_Get) (err error) {
+	err = (&dals.TaskDAL{}).RefuseTask(id, task, user)
+	return
+}
