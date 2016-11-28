@@ -5,7 +5,6 @@ import (
 	"TaskManagementSystem_Api/models/types"
 	"encoding/json"
 	"errors"
-	"log"
 
 	"strings"
 
@@ -140,7 +139,6 @@ func (u *TaskController) Get() {
 // @Failure 403 :uid or :method is empty
 // @router /:uid/:method [put]
 func (u *TaskController) Put() {
-	log.Println("controller update!")
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
 	user, err := (&blls.UserBLL{}).ValidateToken(token)

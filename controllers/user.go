@@ -12,8 +12,9 @@ type UserController struct {
 	beego.Controller
 }
 type signInUserStruct struct {
-	UID      *string `json:"uid"`
-	Password *string `json:"password"`
+	UID         *string `json:"uid"`
+	Password    *string `json:"password"`
+	NewPassword *string `json:"newpassword"`
 }
 type ResponeBodyStruct struct {
 	Data  interface{} `json:"data"`
@@ -70,4 +71,34 @@ func (u *UserController) GetMyUserInfo() {
 	u.Data["json"] = body
 	u.ServeJSON()
 	return
+}
+
+func (u *UserController) ChangePassword() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	userInToken, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+	uid := u.GetString(":uid")
+	if uid != "" {
+		user := new(signInUserStruct)
+		err := json.Unmarshal(u.Ctx.Input.RequestBody, user)
+		if *userInToken.UID == uid {
+			err = (&blls.UserBLL{}).ChangePassword(uid, *user.Password, *user.NewPassword)
+			if err == nil {
+				body.Data = "update success!"
+			} else {
+				body.Error = err.Error()
+			}
+		} else {
+			body.Error = "用户登录错误，请重新登录。"
+		}
+		u.Data["json"] = body
+	}
+	u.ServeJSON()
 }

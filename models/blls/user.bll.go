@@ -60,3 +60,15 @@ func (bll *UserBLL) ValidateToken(token string) (u types.UserInfo_Get, err error
 	u, err = bll.GetUserInfo(token)
 	return
 }
+func (bll *UserBLL) ChangePassword(uid, password, newPassword string) (err error) {
+	sha := sha1.New()
+	io.WriteString(sha, fmt.Sprintf("%s", password))
+	shaOldString := fmt.Sprintf("%x", sha.Sum(nil))
+
+	sha = sha1.New()
+	io.WriteString(sha, fmt.Sprintf("%s", newPassword))
+	shaNewString := fmt.Sprintf("%x", sha.Sum(nil))
+
+	err = (&dals.UserDAL{}).ChangePassword(uid, shaOldString, shaNewString)
+	return
+}

@@ -1,6 +1,7 @@
 package types
 
 type UserInfo_Get struct {
+	UID         *string `json:"uid"`
 	Token       *string `json:"token"`
 	EmpID       *string `json:"empId"`
 	Dept        *string `json:"dept"`

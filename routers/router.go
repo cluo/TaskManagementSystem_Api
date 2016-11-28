@@ -16,6 +16,7 @@ import (
 func init() {
 	beego.Router("/v1/user", &controllers.UserController{}, "get:GetMyUserInfo")
 	beego.Router("/v1/user/signin", &controllers.UserController{}, "post:SignIn")
+	beego.Router("/v1/user/:uid", &controllers.UserController{}, "put:ChangePassword")
 	beego.Router("/v1/employee", &controllers.EmployeeController{}, "get:GetAll")
 
 	beego.Router("/v1/task", &controllers.TaskController{}, "get:GetList;post:Post")

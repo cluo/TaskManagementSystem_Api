@@ -33,7 +33,7 @@ func (dal *UserDAL) GetUserInfo(uid string, password *string) (u *types.UserInfo
 		dal.mongo.Collection.Find(bson.M{"username": uid, "password": *password}).One(oid)
 	}
 	if oid.OID == nil {
-		err = errors.New("该用户在任务管理系统用户表中不存在，请联系管理员。")
+		err = errors.New("用户名密码错误。")
 		return
 	}
 
@@ -50,6 +50,7 @@ func (dal *UserDAL) GetUserInfo(uid string, password *string) (u *types.UserInfo
 	}
 
 	userInfo := new(types.UserInfo_Get)
+	userInfo.UID = &uid
 	common.StructDeepCopy(empInfo, userInfo)
 	dept := new(types.DeptName)
 	err1 := dal.mongo.Db.C("M_Departments").FindId(empInfo.DeptObjectID).One(&dept)
@@ -57,5 +58,27 @@ func (dal *UserDAL) GetUserInfo(uid string, password *string) (u *types.UserInfo
 		userInfo.Dept = dept.Name
 	}
 	u = userInfo
+	return
+}
+
+func (dal *UserDAL) ChangePassword(uid, password, newPassword string) (err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("M_Users")
+	if err != nil {
+		return
+	}
+
+	oid := new(types.ObjectID)
+	dal.mongo.Collection.Find(bson.M{"username": uid, "password": password}).One(oid)
+	if oid.Oid == nil {
+		err = errors.New("用户名密码错误。")
+		return
+	}
+	err = dal.mongo.Collection.UpdateId(*oid.Oid, bson.M{"$set": bson.M{"password": newPassword}})
 	return
 }
