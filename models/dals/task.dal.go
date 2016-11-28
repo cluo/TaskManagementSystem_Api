@@ -232,7 +232,7 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 	} else if task.RealBeginDate == nil && task.RealEndDate != nil {
 		status = "进行中"
 	} else if task.RealBeginDate != nil && task.RealEndDate != nil {
-		status = "完成"
+		status = "已完成"
 	}
 
 	task.Status = &status
@@ -362,7 +362,7 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	} else if (srcTask.RealBeginDate != nil || task.RealBeginDate != nil) && (srcTask.RealEndDate == nil && task.RealEndDate == nil) {
 		status = "进行中"
 	} else if (srcTask.RealBeginDate != nil || task.RealBeginDate != nil) && (srcTask.RealEndDate != nil || task.RealEndDate != nil) {
-		status = "完成"
+		status = "已完成"
 	}
 	task.Status = &status
 
