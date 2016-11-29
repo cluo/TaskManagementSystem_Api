@@ -17,6 +17,7 @@ type TaskHeader struct {
 	RefuseStatus            *string        `bson:"refuseStatus"`
 	CreatorID               *string        `bson:"creatorId"`
 	PrimarySellerID         *string        `bson:"primarySellerId"`
+	PrimaryOCID             *string        `bson:"primaryOCId"`
 	PrimaryExecutorID       *string        `bson:"primaryExecutorId"`
 	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
 	PrimaryExecutor         *string        `bson:"primaryExecutor"`
@@ -78,6 +79,7 @@ type TaskHeader_Get struct {
 	RefuseStatus      *string    `json:"refuseStatus"`
 	CreatorID         *string    `json:"creatorId"`
 	PrimarySellerID   *string    `json:"primarySellerId"`
+	PrimaryOCID       *string    `json:"primaryOCId"`
 	PrimaryExecutorID *string    `json:"primaryExecutorId"`
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
 }

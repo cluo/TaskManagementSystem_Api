@@ -785,17 +785,19 @@ func (dal *TaskDAL) RefuseTask(id string, task types.Task_Post, user types.UserI
 		return
 	}
 
-	desTask := new(types.Task_Post)
 	refuseStatus := ""
 	if OCRefuseFlag {
 		refuseStatus = "OC拒绝"
 	} else if taskExecutorRefuseFlag {
 		refuseStatus = "研发拒绝"
 	}
+	if refuseStatus == "" {
+		err = errors.New("无法拒绝当前任务。")
+		return
+	}
 
-	desTask.RefuseStatus = &refuseStatus
-
-	m, _ := dal.setUpdateBsonMap(*desTask)
+	m := make(map[string]interface{})
+	m["refuseStatus"] = refuseStatus
 
 	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
 	if err != nil {
