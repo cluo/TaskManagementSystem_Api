@@ -29,6 +29,11 @@ func init() {
 	beego.Router("/v1/product/:tid", &controllers.ProductController{}, "get:Get;delete:Delete")
 	beego.Router("/v1/product/:tid/:method", &controllers.ProductController{}, "put:Put")
 
+	beego.Router("/v1/project", &controllers.ProjectController{}, "get:GetList;post:Post")
+	beego.Router("/v1/project/counts", &controllers.ProjectController{}, "get:GetProjectCount")
+	beego.Router("/v1/project/:tid", &controllers.ProjectController{}, "get:Get;delete:Delete")
+	beego.Router("/v1/project/:tid/:method", &controllers.ProjectController{}, "put:Put")
+
 	beego.Router("/v1/communication/:id", &controllers.CommunicationController{}, "get:Get")
 	beego.Router("/v1/communication", &controllers.CommunicationController{}, "post:Post")
 }

@@ -7,14 +7,14 @@ import (
 )
 
 type ProductHeader struct {
-	ID                     *string    `bson:"id"`
-	Name                   *string    `bson:"name"`
-	PlanningReleaseDate    *time.Time `bson:"planningReleaseDate" `
-	RealReleaseDate        *time.Time `bson:"realReleaseDate" `
-	Status                 *string    `bson:"status"`
-	CreatorID              *string    `bson:"creatorId"`
-	ProductManagerObjectID *string    `bson:"productManagerObjectId"`
-	ProductManagerID       *string    `bson:"productManagerId"`
+	ID                     *string        `bson:"id"`
+	Name                   *string        `bson:"name"`
+	PlanningReleaseDate    *time.Time     `bson:"planningReleaseDate" `
+	RealReleaseDate        *time.Time     `bson:"realReleaseDate" `
+	Status                 *string        `bson:"status"`
+	CreatorID              *string        `bson:"creatorId"`
+	ProductManagerObjectID *bson.ObjectId `bson:"productManagerObjectId"`
+	ProductManagerID       *string        `bson:"productManagerId"`
 }
 
 type ProductHeader_Get struct {
