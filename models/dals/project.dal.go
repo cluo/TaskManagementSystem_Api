@@ -156,7 +156,7 @@ func (dal *ProjectDAL) GetProjectDetail(id string) (projectGet *types.Project_Ge
 
 // AddProject 定义
 func (dal *ProjectDAL) AddProject(projectPost types.Project_Post, user types.UserInfo_Get) (err error) {
-	if !user.CheckPermissions(1, 11, 19) {
+	if !user.CheckPermissions(1, 21, 29) {
 		err = errors.New("当前登录不能添加项目。")
 		return
 	}
