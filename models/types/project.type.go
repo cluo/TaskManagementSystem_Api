@@ -6,7 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type TaskHeader struct {
+type ProjectHeader struct {
 	ID                      *string        `bson:"id"`
 	Name                    *string        `bson:"name"`
 	PlanningBeginDate       *time.Time     `bson:"planningBeginDate"`
@@ -23,7 +23,7 @@ type TaskHeader struct {
 	PrimaryExecutor         *string        `bson:"primaryExecutor"`
 }
 
-type Task struct {
+type Project struct {
 	OID                     bson.ObjectId  `bson:"_id"`
 	ID                      *string        `bson:"id"`
 	Name                    *string        `bson:"name" `
@@ -51,24 +51,8 @@ type Task struct {
 	RefuseStatus          *string        `bson:"refuseStatus"`
 	ParentProductObjectID *bson.ObjectId `bson:"parentProductObjectId" `
 	ParentProductID       *string        `bson:"parentProductId"`
-	ParentProjectObjectID *bson.ObjectId `bson:"parentProjectObjectId" `
-	ParentProjectID       *string        `bson:"parentProjectId"`
 }
-type EmployeeName struct {
-	Name *string `bson:"name"`
-}
-
-type ProductName struct {
-	Name *string `bson:"name"`
-}
-type ProjectName struct {
-	Name *string `bson:"name"`
-}
-type MaxID struct {
-	ID *string `bson:"id"`
-}
-
-type TaskHeader_Get struct {
+type ProjectHeader_Get struct {
 	ID                *string    `json:"id"`
 	Name              *string    `json:"name"`
 	PlanningBeginDate *time.Time `json:"planningBeginDate"`
@@ -84,7 +68,7 @@ type TaskHeader_Get struct {
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
 }
 
-type Task_Get struct {
+type Project_Get struct {
 	ID                *string    `json:"id"`
 	Name              *string    `json:"name"`
 	Description       *string    `json:"description"`
@@ -110,11 +94,9 @@ type Task_Get struct {
 	RefuseStatus      *string    `json:"refuseStatus"`
 	ParentProductID   *string    `json:"parentProductId"`
 	ParentProduct     *string    `json:"parentProduct"`
-	ParentProjectID   *string    `json:"parentProjectId"`
-	ParentProject     *string    `json:"parentProject"`
 }
 
-type Task_Post struct {
+type Project_Post struct {
 	ID                      *string        `json:"id"`
 	Name                    *string        `json:"name" `
 	Description             *string        `json:"description" `
@@ -142,6 +124,4 @@ type Task_Post struct {
 	RefuseReason          *string        `json:"refuseReason"`
 	ParentProductObjectID *bson.ObjectId `json:"parentProductObjectId" `
 	ParentProductID       *string        `json:"parentProductId"`
-	ParentProjectObjectID *bson.ObjectId `json:"parentProjectObjectId" `
-	ParentProjectID       *string        `json:"parentProjectId"`
 }
