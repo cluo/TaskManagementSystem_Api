@@ -25,7 +25,7 @@ func (dal *EmployeeDAL) GetAllEmployees() (e []*types.Employee_Get, err error) {
 	}
 
 	var employeeList []*types.EmployeeInfo
-	err = dal.mongo.Collection.Find(nil).All(&employeeList)
+	err = dal.mongo.Collection.Find(nil).Sort("name").All(&employeeList)
 	if err != nil {
 		return
 	}
