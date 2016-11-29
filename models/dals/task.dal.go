@@ -795,11 +795,8 @@ func (dal *TaskDAL) RefuseTask(id string, task types.Task_Post, user types.UserI
 
 	desTask.RefuseStatus = &refuseStatus
 
-	m, err1 := dal.setUpdateBsonMap(*desTask)
-	if err1 != nil {
-		err = err1
-		return
-	}
+	m, _ := dal.setUpdateBsonMap(*desTask)
+
 	err = dal.mongo.Collection.Update(bson.M{"id": id}, bson.M{"$set": m})
 	if err != nil {
 		return
