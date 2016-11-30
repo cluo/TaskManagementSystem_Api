@@ -218,7 +218,7 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 		id = fmt.Sprintf("T%s%04d", dateString, maxNum+1)
 	}
 	task.ID = &id
-	now := time.Now()
+	now := time.Now().UTC()
 	task.CreatedTime = &now
 	var status string
 	if task.PrimaryOCID == nil {

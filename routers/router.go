@@ -20,6 +20,8 @@ func init() {
 	beego.Router("/v1/employee", &controllers.EmployeeController{}, "get:GetAll")
 
 	beego.Router("/v1/task", &controllers.TaskController{}, "get:GetList;post:Post")
+	beego.Router("/v1/task/screen", &controllers.TaskController{}, "get:GetList")
+	beego.Router("/v1/task/screen/counts", &controllers.TaskController{}, "get:GetTaskCount")
 	beego.Router("/v1/task/counts", &controllers.TaskController{}, "get:GetTaskCount")
 	beego.Router("/v1/task/:tid", &controllers.TaskController{}, "get:Get;delete:Delete")
 	beego.Router("/v1/task/:tid/:method", &controllers.TaskController{}, "put:Put")
