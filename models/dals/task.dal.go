@@ -385,7 +385,7 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	if srcTask.RefuseStatus == nil || !(*srcTask.Status == "新建" || *srcTask.Status == "分配中" || *srcTask.Status == "计划中") {
 		return
 	}
-	sentTime := time.Now()
+	sentTime := time.Now().UTC()
 	content := "重新激活任务。"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -549,7 +549,7 @@ func (dal *TaskDAL) StartTask(id string, task types.Task_Post, user types.UserIn
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()
+	sentTime := time.Now().UTC()
 	content := "开始任务。"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -615,7 +615,7 @@ func (dal *TaskDAL) ProgressTask(id string, task types.Task_Post, user types.Use
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()
+	sentTime := time.Now().UTC()
 	content := fmt.Sprintf("填写任务进度，当前任务进度：%d%%", *task.Percent)
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -675,7 +675,7 @@ func (dal *TaskDAL) FinishTask(id string, task types.Task_Post, user types.UserI
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()
+	sentTime := time.Now().UTC()
 	content := "完成任务"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -746,7 +746,7 @@ func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserIn
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()
+	sentTime := time.Now().UTC()
 	content := "关闭任务"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -804,7 +804,7 @@ func (dal *TaskDAL) RefuseTask(id string, task types.Task_Post, user types.UserI
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()
+	sentTime := time.Now().UTC()
 	content := "拒绝任务，拒绝原因：" + *task.RefuseReason
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -813,5 +813,177 @@ func (dal *TaskDAL) RefuseTask(id string, task types.Task_Post, user types.UserI
 		Content:    &content,
 	}
 	_, err = (&CommunicationDAL{}).AddCommunication(c)
+	return
+}
+
+// GetTaskScreen 定义
+func (dal *TaskDAL) GetTaskScreen(pageSize, pageNumber int, typeString string) (taskGetList []*types.TaskScreen_Get, err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+
+	if pageSize < 5 {
+		pageSize = 5
+	}
+	if pageNumber < 1 {
+		pageNumber = 1
+	}
+	var taskList []*types.TaskScreen
+	if strings.ToLower(typeString) == "project" {
+		err = dal.mongo.Collection.Find(bson.M{"parentProjectObjectId": bson.M{"$ne": nil}}).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
+	} else if strings.ToLower(typeString) == "project" {
+		err = dal.mongo.Collection.Find(bson.M{"parentProductObjectId": bson.M{"$ne": nil}, "parentProjectObjectId": nil}).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
+	} else {
+		err = dal.mongo.Collection.Find(bson.M{"parentProductObjectId": nil, "parentProjectObjectId": nil}).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
+	}
+	if err != nil {
+		return
+	}
+	taskCount := len(taskList)
+	taskGetList = make([]*types.TaskScreen_Get, taskCount, taskCount)
+	for index, value := range taskList {
+		taskGet := new(types.TaskScreen_Get)
+		common.StructDeepCopy(value, taskGet)
+		// 获取人员姓名
+		emp := new(types.EmployeeName)
+		if value.PrimarySellerObjectID != nil {
+			err1 := dal.mongo.Db.C("M_Employees").FindId(*value.PrimarySellerObjectID).One(&emp)
+			if err1 == nil {
+				taskGet.PrimarySeller = emp.Name
+			}
+		}
+		emp = new(types.EmployeeName)
+		if value.PrimaryExecutorObjectID != nil {
+			err1 := dal.mongo.Db.C("M_Employees").FindId(*value.PrimaryExecutorObjectID).One(&emp)
+			if err1 == nil {
+				taskGet.PrimaryExecutor = emp.Name
+			}
+		}
+		project := new(types.ProjectName)
+		err1 := dal.mongo.Db.C("T_Projects").FindId(*value.ParentProjectObjectID).One(&emp)
+		if err1 == nil {
+			taskGet.ParentProject = project.Name
+		} else {
+			taskGet.ParentProjectID = nil
+		}
+		product := new(types.ProductName)
+		err1 = dal.mongo.Db.C("T_Products").FindId(*value.ParentProductObjectID).One(&emp)
+		if err1 == nil {
+			taskGet.ParentProduct = product.Name
+		} else {
+			taskGet.ParentProjectID = nil
+		}
+		taskGetList[index] = taskGet
+	}
+	return
+}
+
+// GetTaskScreenCount 定义
+func (dal *TaskDAL) GetTaskScreenCount() (counts map[string]map[string]int, err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Tasks")
+	if err != nil {
+		return
+	}
+	counts = make(map[string]map[string]int)
+	allCounts := make(map[string]int)
+	projectCounts := make(map[string]int)
+	productCounts := make(map[string]int)
+	othersCounts := make(map[string]int)
+
+	// 所有任务数
+	totalCount, err1 := dal.mongo.Collection.Find(nil).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	allCounts["total"] = totalCount
+	totalCount, err1 = dal.mongo.Collection.Find(bson.M{"parentProjectObjectId": bson.M{"$ne": nil}}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	projectCounts["total"] = totalCount
+	totalCount, err1 = dal.mongo.Collection.Find(bson.M{"parentProductObjectId": bson.M{"$ne": nil}, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	productCounts["total"] = totalCount
+	totalCount, err1 = dal.mongo.Collection.Find(bson.M{"parentProductObjectId": nil, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	othersCounts["total"] = totalCount
+	// 进行中任务数
+	now := time.Now()
+	date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	onGoingCount, err1 := dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": date}}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	allCounts["onGoing"] = onGoingCount
+	onGoingCount, err1 = dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": date}, "parentProductObjectId": bson.M{"$ne": nil}, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	projectCounts["onGoing"] = onGoingCount
+	onGoingCount, err1 = dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": date}, "parentProductObjectId": bson.M{"$ne": nil}, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	productCounts["onGoing"] = onGoingCount
+	onGoingCount, err1 = dal.mongo.Collection.Find(bson.M{"status": "进行中", "planningEndDate": bson.M{"$lte": date}, "parentProductObjectId": nil, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	othersCounts["onGoing"] = onGoingCount
+	// 完成任务数
+	finishedCount, err1 := dal.mongo.Collection.Find(bson.M{"$or": []bson.M{bson.M{"status": "已完成"}, bson.M{"status": "已关闭"}}}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	allCounts["finished"] = finishedCount
+	finishedCount, err1 = dal.mongo.Collection.Find(bson.M{"$or": []bson.M{bson.M{"status": "已完成"}, bson.M{"status": "已关闭"}}, "planningEndDate": bson.M{"$lte": date}, "parentProductObjectId": bson.M{"$ne": nil}, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	projectCounts["finished"] = finishedCount
+	finishedCount, err1 = dal.mongo.Collection.Find(bson.M{"$or": []bson.M{bson.M{"status": "已完成"}, bson.M{"status": "已关闭"}}, "planningEndDate": bson.M{"$lte": date}, "parentProductObjectId": bson.M{"$ne": nil}, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	productCounts["finished"] = finishedCount
+	finishedCount, err1 = dal.mongo.Collection.Find(bson.M{"$or": []bson.M{bson.M{"status": "已完成"}, bson.M{"status": "已关闭"}}, "planningEndDate": bson.M{"$lte": date}, "parentProductObjectId": nil, "parentProjectObjectId": nil}).Count()
+	if err1 != nil {
+		err = err1
+		return
+	}
+	othersCounts["finished"] = finishedCount
+
+	counts["all"] = allCounts
+	counts["project"] = projectCounts
+	counts["product"] = productCounts
+	counts["others"] = othersCounts
 	return
 }

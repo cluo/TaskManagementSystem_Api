@@ -53,3 +53,11 @@ func (bll *TaskBLL) RefuseTask(id string, task types.Task_Post, user types.UserI
 	err = (&dals.TaskDAL{}).RefuseTask(id, task, user)
 	return
 }
+func (bll *TaskBLL) GetTaskScreen(pageSize, pageNumber int, typeString string) (t []*types.TaskScreen_Get, err error) {
+	t, err = (&dals.TaskDAL{}).GetTaskScreen(pageSize, pageNumber, typeString)
+	return
+}
+func (bll *TaskBLL) GetTaskScreenCount() (counts map[string]map[string]int, err error) {
+	counts, err = (&dals.TaskDAL{}).GetTaskScreenCount()
+	return
+}

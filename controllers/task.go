@@ -47,7 +47,7 @@ func (u *TaskController) Post() {
 }
 
 // @Title GetList
-// @Description get all Tasks (Header)
+// @Description get a page Tasks (Header)
 // @Success 200 {object} types.TaskHeader_Get
 // @router / [get]
 func (u *TaskController) GetList() {
@@ -211,6 +211,60 @@ func (u *TaskController) Delete() {
 		body.Data = "delete success!"
 	} else {
 		body.Error = err.Error()
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
+}
+
+// @Title GetTaskScreen
+// @Description get a page Tasks
+// @Success 200 {object} types.TaskScreen_Get
+// @router / [get]
+func (u *TaskController) GetTaskScreen() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+	pageSize, _ := u.GetInt("pagesize", 5)
+	pageNumber, _ := u.GetInt("page", 1)
+	typeString := u.GetString("type", "others")
+	tasks, err := (&blls.TaskBLL{}).GetTaskScreen(pageSize, pageNumber, typeString)
+	if err != nil {
+		body.Error = err.Error()
+	} else {
+		body.Data = tasks
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
+}
+
+// @Title GetTaskScreenCount
+// @Description get Task Count
+// @Success 200 {object}
+// @router / [get]
+func (u *TaskController) GetTaskScreenCount() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	counts, err := (&blls.TaskBLL{}).GetTaskScreenCount()
+	if err != nil {
+		body.Error = err.Error()
+	} else {
+		body.Data = counts
 	}
 	u.Data["json"] = body
 	u.ServeJSON()

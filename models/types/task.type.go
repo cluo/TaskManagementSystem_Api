@@ -22,6 +22,22 @@ type TaskHeader struct {
 	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
 	PrimaryExecutor         *string        `bson:"primaryExecutor"`
 }
+type TaskScreen struct {
+	ID                      *string        `bson:"id"`
+	Name                    *string        `bson:"name"`
+	PlanningBeginDate       *time.Time     `bson:"planningBeginDate"`
+	PlanningEndDate         *time.Time     `bson:"planningEndDate"`
+	RealBeginDate           *time.Time     `bson:"realBeginDate"`
+	RealEndDate             *time.Time     `bson:"realEndDate"`
+	Percent                 *int           `bson:"percent"`
+	Status                  *string        `bson:"status"`
+	PrimarySellerObjectID   *string        `bson:"primarySellerObjectId"`
+	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
+	ParentProductObjectID   *bson.ObjectId `bson:"parentProductObjectId"`
+	ParentProductID         *string        `bson:"parentProductId"`
+	ParentProjectObjectID   *bson.ObjectId `bson:"parentProjectObjectId"`
+	ParentProjectID         *string        `bson:"parentProjectId"`
+}
 
 type Task struct {
 	OID                     bson.ObjectId  `bson:"_id"`
@@ -83,7 +99,22 @@ type TaskHeader_Get struct {
 	PrimaryExecutorID *string    `json:"primaryExecutorId"`
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
 }
-
+type TaskScreen_Get struct {
+	ID                *string    `json:"id"`
+	Name              *string    `json:"name"`
+	PlanningBeginDate *time.Time `json:"planningBeginDate"`
+	PlanningEndDate   *time.Time `json:"planningEndDate"`
+	RealBeginDate     *time.Time `json:"realBeginDate"`
+	RealEndDate       *time.Time `json:"realEndDate"`
+	Percent           *int       `json:"percent"`
+	Status            *string    `json:"status"`
+	PrimarySeller     *string    `json:"primarySeller"`
+	PrimaryExecutor   *string    `json:"primaryExecutor"`
+	ParentProductID   *string    `json:"parentProductId"`
+	ParentProduct     *string    `json:"parentProductId"`
+	ParentProjectID   *string    `json:"parentProject"`
+	ParentProject     *string    `json:"parentProject"`
+}
 type Task_Get struct {
 	ID                *string    `json:"id"`
 	Name              *string    `json:"name"`
