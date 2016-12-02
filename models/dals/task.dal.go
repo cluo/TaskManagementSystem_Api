@@ -49,7 +49,7 @@ func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int) (taskGetList []*typ
 		// 获取人员姓名
 		emp := new(types.EmployeeName)
 		if value.PrimaryExecutorObjectID != nil {
-			err1 := dal.mongo.Db.C("M_Employees").FindId(*value.PrimaryExecutorObjectID).One(&emp)
+			err1 := dal.mongo.Db.C("M_Employees").FindId(value.PrimaryExecutorObjectID).One(&emp)
 			if err1 == nil {
 				taskGet.PrimaryExecutor = emp.Name
 			}
@@ -854,27 +854,27 @@ func (dal *TaskDAL) GetTaskScreen(pageSize, pageNumber int, typeString string) (
 		// 获取人员姓名
 		emp := new(types.EmployeeName)
 		if value.PrimarySellerObjectID != nil {
-			err1 := dal.mongo.Db.C("M_Employees").FindId(*value.PrimarySellerObjectID).One(&emp)
+			err1 := dal.mongo.Db.C("M_Employees").FindId(value.PrimarySellerObjectID).One(&emp)
 			if err1 == nil {
 				taskGet.PrimarySeller = emp.Name
 			}
 		}
 		emp = new(types.EmployeeName)
 		if value.PrimaryExecutorObjectID != nil {
-			err1 := dal.mongo.Db.C("M_Employees").FindId(*value.PrimaryExecutorObjectID).One(&emp)
+			err1 := dal.mongo.Db.C("M_Employees").FindId(value.PrimaryExecutorObjectID).One(&emp)
 			if err1 == nil {
 				taskGet.PrimaryExecutor = emp.Name
 			}
 		}
 		project := new(types.ProjectName)
-		err1 := dal.mongo.Db.C("T_Projects").FindId(*value.ParentProjectObjectID).One(&emp)
+		err1 := dal.mongo.Db.C("T_Projects").FindId(value.ParentProjectObjectID).One(&project)
 		if err1 == nil {
 			taskGet.ParentProject = project.Name
 		} else {
 			taskGet.ParentProjectID = nil
 		}
 		product := new(types.ProductName)
-		err1 = dal.mongo.Db.C("T_Products").FindId(*value.ParentProductObjectID).One(&emp)
+		err1 = dal.mongo.Db.C("T_Products").FindId(value.ParentProductObjectID).One(&product)
 		if err1 == nil {
 			taskGet.ParentProduct = product.Name
 		} else {

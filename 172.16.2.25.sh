@@ -12,6 +12,8 @@ docker kill ambassador;docker rm ambassador;
 #     -p 27017:27017 -p 5432:5432 -p 6379:6379 \
 #     --name=ambassador 211.157.146.6:5000/ambassador:latest
 
+docker rmi 211.157.146.6:5000/mongodb-enterprise
+
 docker kill redis task-management-mongo ambassador; \
     docker rm redis task-management-mongo ambassador;
 
