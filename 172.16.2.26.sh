@@ -39,6 +39,7 @@ docker run -d -e TZ="Asia/Shanghai" --name=task-nginx -p 6001:6001 -p 6009:6009 
     --link frontend1:frontend1 --link api1:api1 \
     211.157.146.6:5000/task-nginx
 
+docker run -it -e TZ="Asia/Shanghai" --link ambassador:mongo --link ambassador:redis --name=api1 211.157.146.6:5000/task-management-api bash
 
 docker run -d -e TZ="Asia/Shanghai" --name=ambassador --expose 80 --expose 27017 --expose 6379 \
     -e MONGO_PORT_27017_TCP=tcp://172.16.2.25:27017 \

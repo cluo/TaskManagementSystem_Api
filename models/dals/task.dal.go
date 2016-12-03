@@ -152,7 +152,6 @@ func (dal *TaskDAL) GetTaskDetail(id string) (taskGet *types.Task_Get, err error
 	// 		taskGet.OtherExecutors[index] = *emp.Name
 	// 	}
 	// }
-
 	product := new(types.ProductName)
 	err1 = dal.mongo.Db.C("T_Products").FindId(task.ParentProductObjectID).One(&emp)
 	if err1 == nil {
