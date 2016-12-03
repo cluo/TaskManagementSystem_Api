@@ -218,7 +218,7 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 		id = fmt.Sprintf("T%s%04d", dateString, maxNum+1)
 	}
 	task.ID = &id
-	now := time.Now()()
+	now := time.Now()
 	task.CreatedTime = &now
 	var status string
 	if task.PrimaryOCID == nil {
@@ -385,7 +385,7 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	if srcTask.RefuseStatus == nil || !(*srcTask.Status == "新建" || *srcTask.Status == "分配中" || *srcTask.Status == "计划中") {
 		return
 	}
-	sentTime := time.Now()()
+	sentTime := time.Now()
 	content := "重新激活任务。"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -549,7 +549,7 @@ func (dal *TaskDAL) StartTask(id string, task types.Task_Post, user types.UserIn
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()()
+	sentTime := time.Now()
 	content := "开始任务。"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -615,7 +615,7 @@ func (dal *TaskDAL) ProgressTask(id string, task types.Task_Post, user types.Use
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()()
+	sentTime := time.Now()
 	content := fmt.Sprintf("填写任务进度，当前任务进度：%d%%", *task.Percent)
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -675,7 +675,7 @@ func (dal *TaskDAL) FinishTask(id string, task types.Task_Post, user types.UserI
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()()
+	sentTime := time.Now()
 	content := "完成任务"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -746,7 +746,7 @@ func (dal *TaskDAL) CloseTask(id string, task types.Task_Post, user types.UserIn
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()()
+	sentTime := time.Now()
 	content := "关闭任务"
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,
@@ -804,7 +804,7 @@ func (dal *TaskDAL) RefuseTask(id string, task types.Task_Post, user types.UserI
 	if err != nil {
 		return
 	}
-	sentTime := time.Now()()
+	sentTime := time.Now()
 	content := "拒绝任务，拒绝原因：" + *task.RefuseReason
 	c := types.Communication_Post{
 		RelevantID: srcTask.ID,

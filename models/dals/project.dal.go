@@ -177,7 +177,7 @@ func (dal *ProjectDAL) AddProject(projectPost types.Project_Post, user types.Use
 	project.RealReleaseDate = nil
 
 	project.OID = bson.NewObjectId()
-	now := time.Now()()
+	now := time.Now()
 	project.CreatedTime = &now
 	status := "新建"
 	project.Status = &status
