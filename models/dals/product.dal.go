@@ -168,7 +168,7 @@ func (dal *ProductDAL) AddProduct(productPost types.Product_Post, user types.Use
 	product.RealReleaseDate = nil
 
 	product.OID = bson.NewObjectId()
-	now := time.Now().UTC()
+	now := time.Now()()
 	product.CreatedTime = &now
 	status := "新建"
 	product.Status = &status
