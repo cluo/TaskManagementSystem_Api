@@ -18,7 +18,7 @@ type TaskDAL struct {
 }
 
 // GetTaskHeaders 定义
-func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int) (taskGetList []*types.TaskHeader_Get, err error) {
+func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int, searchCriteria string) (taskGetList []*types.TaskHeader_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -37,7 +37,11 @@ func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int) (taskGetList []*typ
 		pageNumber = 1
 	}
 	var taskList []*types.TaskHeader
-	err = dal.mongo.Collection.Find(nil).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
+	var queue map[string]interface{}
+	if strings.Trim(searchCriteria, " ") != "" {
+		queue = bson.M{"name": bson.M{"$regex": searchCriteria, "$options": "i"}}
+	}
+	err = dal.mongo.Collection.Find(queue).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
 	if err != nil {
 		return
 	}

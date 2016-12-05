@@ -35,7 +35,8 @@ docker run -d -e TZ="Asia/Shanghai" --name=ambassador --expose 27017 --expose 63
     211.157.146.6:5000/ambassador:latest
 docker run -d -e TZ="Asia/Shanghai" --name=frontend1 211.157.146.6:5000/task-management-frontend
 docker run -d -e TZ="Asia/Shanghai" --link ambassador:mongo --link ambassador:redis --name=api1 211.157.146.6:5000/task-management-api
-docker run -d -e TZ="Asia/Shanghai" --name=task-nginx -p 6001:6001 -p 6009:6009 \
+docker run -d -e TZ="Asia/Shanghai" --name=task-nginx \
+    -p 6001:6001 -p 6002:6002-p 6006:6006 -p 6009:6009 \
     --link frontend1:frontend1 --link api1:api1 \
     211.157.146.6:5000/task-nginx
 
@@ -59,6 +60,8 @@ docker run -d -e TZ="Asia/Shanghai" --name=task-nginx -p 6001:6001 -p 6009:6009 
 
 
 
+docker run -d -p 80:80  -e TZ="Asia/Shanghai" --name=frontend1 211.157.146.6:5000/task-management-frontend
+docker run -d -p 81:80  -e TZ="Asia/Shanghai" --link task-management-mongo:mongo --link redis:redis --name=api1 211.157.146.6:5000/task-management-api
 
 
 

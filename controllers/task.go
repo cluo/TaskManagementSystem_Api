@@ -8,6 +8,8 @@ import (
 
 	"strings"
 
+	"log"
+
 	"github.com/astaxie/beego"
 )
 
@@ -63,8 +65,9 @@ func (u *TaskController) GetList() {
 	}
 	pageSize, _ := u.GetInt("pagesize", 5)
 	pageNumber, _ := u.GetInt("page", 1)
-
-	tasks, err := (&blls.TaskBLL{}).GetTasks(pageSize, pageNumber)
+	searchCriteria := u.GetString("searchCriteria")
+	log.Println(searchCriteria)
+	tasks, err := (&blls.TaskBLL{}).GetTasks(pageSize, pageNumber, searchCriteria)
 	if err != nil {
 		body.Error = err.Error()
 	} else {
