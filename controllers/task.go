@@ -55,7 +55,7 @@ func (u *TaskController) Post() {
 func (u *TaskController) GetList() {
 	body := &ResponeBodyStruct{}
 	token := u.Ctx.Input.Header("X-Auth-Token")
-	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	user, err := (&blls.UserBLL{}).ValidateToken(token)
 	if err != nil {
 		body.Error = err.Error()
 		u.Data["json"] = body
@@ -66,8 +66,9 @@ func (u *TaskController) GetList() {
 	pageSize, _ := u.GetInt("pagesize", 5)
 	pageNumber, _ := u.GetInt("page", 1)
 	searchCriteria := u.GetString("searchCriteria")
+	searchCriteria2 := u.GetString("searchCriteria2")
 	log.Println(searchCriteria)
-	tasks, err := (&blls.TaskBLL{}).GetTasks(pageSize, pageNumber, searchCriteria)
+	tasks, err := (&blls.TaskBLL{}).GetTasks(pageSize, pageNumber, searchCriteria, searchCriteria2, user)
 	if err != nil {
 		body.Error = err.Error()
 	} else {

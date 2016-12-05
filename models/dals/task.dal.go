@@ -18,7 +18,7 @@ type TaskDAL struct {
 }
 
 // GetTaskHeaders 定义
-func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int, searchCriteria string) (taskGetList []*types.TaskHeader_Get, err error) {
+func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int, searchCriteria, searchCriteria2 string, user types.UserInfo_Get) (taskGetList []*types.TaskHeader_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
@@ -37,9 +37,29 @@ func (dal *TaskDAL) GetTaskHeaders(pageSize, pageNumber int, searchCriteria stri
 		pageNumber = 1
 	}
 	var taskList []*types.TaskHeader
-	var queue map[string]interface{}
+	queue := make(map[string]interface{})
 	if strings.Trim(searchCriteria, " ") != "" {
-		queue = bson.M{"name": bson.M{"$regex": searchCriteria, "$options": "i"}}
+		queue["name"] = bson.M{"$regex": searchCriteria, "$options": "i"}
+	}
+	if searchCriteria2 == "processing" {
+		if user.CheckPermissions(99) {
+			queue["$or"] = []bson.M{bson.M{"status": "新建", "refuseStatus": nil}, bson.M{"status": "分配中", "refuseStatus": nil}, bson.M{"status": "计划中", "refuseStatus": bson.M{"$ne": nil}}, bson.M{"status": "已完成"}}
+		}
+		if user.CheckPermissions(98) {
+			// queue["$and"] = []bson.M{bson.M{"refuseStatus":bson.M{"$ne": nil}},bson.M{"$or",[]bson.M{bson.M{"status": "新建"}, bson.M{"status": "分配中"}}}}
+			queue["refuseStatus"] = bson.M{"$ne": nil}
+			queue["$or"] = []bson.M{bson.M{"status": "新建"}, bson.M{"status": "分配中"}}
+		}
+		if user.CheckPermissions(11, 21) {
+			queue["$or"] = []bson.M{bson.M{"status": "计划中"}, bson.M{"status": "未开始", "primaryExecutorId": user.EmpID}, bson.M{"status": "进行中", "primaryExecutorId": user.EmpID}}
+		}
+		if user.CheckPermissions(17, 18, 19, 29) {
+			queue["primaryExecutorId"] = user.EmpID
+			queue["$or"] = []bson.M{bson.M{"status": "计划中"}, bson.M{"status": "未开始"}, bson.M{"status": "进行中"}}
+		}
+	}
+	if searchCriteria2 == "charging" {
+		queue["$or"] = []bson.M{bson.M{"creatorId": user.EmpID}, bson.M{"primarySellerId": user.EmpID}, bson.M{"primaryOCId": user.EmpID}, bson.M{"primaryExecutorId": user.EmpID}}
 	}
 	err = dal.mongo.Collection.Find(queue).Sort("-id").Skip((pageNumber - 1) * pageSize).Limit(pageSize).All(&taskList)
 	if err != nil {
