@@ -74,6 +74,32 @@ func (u *ProductController) GetList() {
 	u.ServeJSON()
 }
 
+// @Title GetList
+// @Description get all GetAll (Id/Name)
+// @Success 200 {object} types.ProductHeader_Get
+// @router / [get]
+func (u *ProductController) GetAll() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	products, err := (&blls.ProductBLL{}).GetAllProducts()
+	if err != nil {
+		body.Error = err.Error()
+	} else {
+		body.Data = products
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
+}
+
 // @Title GetProductCount
 // @Description get Product Count
 // @Success 200 {object}

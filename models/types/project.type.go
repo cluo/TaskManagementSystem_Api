@@ -6,9 +6,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type ProjectName struct {
+	ID   *string `bson:"id" json:"id"`
+	Name *string `bson:"name" json:"name"`
+}
+
 type ProjectHeader struct {
 	ID                     *string        `bson:"id"`
-	Name                   *string        `bson:"name" `
+	Name                   *string        `bson:"name"`
 	CreatorID              *string        `bson:"creatorId"`
 	Status                 *string        `bson:"status"`
 	PrimarySellerID        *string        `bson:"primarySellerId"`

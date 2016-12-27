@@ -8,6 +8,10 @@ import (
 type ProductBLL struct {
 }
 
+func (bll *ProductBLL) GetAllProducts() (t []*types.ProductName, err error) {
+	t, err = (&dals.ProductDAL{}).GetAllProducts()
+	return
+}
 func (bll *ProductBLL) GetProducts(pageSize, pageNumber int) (t []*types.ProductHeader_Get, err error) {
 	t, err = (&dals.ProductDAL{}).GetProductHeaders(pageSize, pageNumber)
 	return

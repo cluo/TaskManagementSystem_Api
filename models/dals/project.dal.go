@@ -15,6 +15,23 @@ type ProjectDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
+// GetAllProjects 定义
+func (dal *ProjectDAL) GetAllProjects() (projectGetList []*types.ProjectName, err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Projects")
+	if err != nil {
+		return
+	}
+
+	err = dal.mongo.Collection.Find(bson.M{"status": bson.M{"$gt": "已关闭"}}).Sort("-id").All(&projectGetList)
+	return
+}
+
 // GetProjectHeaders 定义
 func (dal *ProjectDAL) GetProjectHeaders(pageSize, pageNumber int) (projectGetList []*types.ProjectHeader_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()

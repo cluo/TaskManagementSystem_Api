@@ -8,6 +8,10 @@ import (
 type ProjectBLL struct {
 }
 
+func (bll *ProjectBLL) GetAllProjects() (t []*types.ProjectName, err error) {
+	t, err = (&dals.ProjectDAL{}).GetAllProjects()
+	return
+}
 func (bll *ProjectBLL) GetProjects(pageSize, pageNumber int) (t []*types.ProjectHeader_Get, err error) {
 	t, err = (&dals.ProjectDAL{}).GetProjectHeaders(pageSize, pageNumber)
 	return

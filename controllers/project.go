@@ -74,6 +74,32 @@ func (u *ProjectController) GetList() {
 	u.ServeJSON()
 }
 
+// @Title GetAll
+// @Description get all Projects (id/name)
+// @Success 200 {object} types.ProjectHeader_Get
+// @router / [get]
+func (u *ProjectController) GetAll() {
+	body := &ResponeBodyStruct{}
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
+
+	projects, err := (&blls.ProjectBLL{}).GetAllProjects()
+	if err != nil {
+		body.Error = err.Error()
+	} else {
+		body.Data = projects
+	}
+	u.Data["json"] = body
+	u.ServeJSON()
+}
+
 // @Title GetProjectCount
 // @Description get Project Count
 // @Success 200 {object}

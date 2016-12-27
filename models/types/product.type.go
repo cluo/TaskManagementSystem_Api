@@ -6,6 +6,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type ProductName struct {
+	ID   *string `bson:"id" json:"id"`
+	Name *string `bson:"name" json:"name"`
+}
+
 type ProductHeader struct {
 	ID                     *string        `bson:"id"`
 	Name                   *string        `bson:"name"`

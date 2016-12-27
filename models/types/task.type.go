@@ -74,12 +74,6 @@ type EmployeeName struct {
 	Name *string `bson:"name"`
 }
 
-type ProductName struct {
-	Name *string `bson:"name"`
-}
-type ProjectName struct {
-	Name *string `bson:"name"`
-}
 type MaxID struct {
 	ID *string `bson:"id"`
 }

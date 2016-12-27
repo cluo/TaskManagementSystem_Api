@@ -290,6 +290,20 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 	} else {
 		task.PrimaryExecutorObjectID = objectID.Oid
 	}
+	objectID = new(types.ObjectID)
+	dal.mongo.Db.C("T_Project").Find(bson.M{"id": task.ParentProjectID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		task.ParentProjectID = nil
+	} else {
+		task.ParentProjectObjectID = objectID.Oid
+	}
+	objectID = new(types.ObjectID)
+	dal.mongo.Db.C("T_Products").Find(bson.M{"id": task.ParentProductID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		task.ParentProductID = nil
+	} else {
+		task.ParentProductObjectID = objectID.Oid
+	}
 	err = dal.mongo.Collection.Insert(task)
 	if err != nil && strings.Contains(err.Error(), "E11000 duplicate key error collection:") {
 		return dal.AddTask(taskPost, user)
@@ -468,6 +482,7 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 			m["primaryExecutorObjectId"] = nil
 		}
 	}
+
 	if task.OtherExecutors != nil {
 		m["otherExecutors"] = *task.OtherExecutors
 	}

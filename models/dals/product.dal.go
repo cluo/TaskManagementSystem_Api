@@ -15,6 +15,23 @@ type ProductDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
+// GetAllProducts 定义
+func (dal *ProductDAL) GetAllProducts() (productGetList []*types.ProductName, err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Products")
+	if err != nil {
+		return
+	}
+
+	err = dal.mongo.Collection.Find(bson.M{"status": bson.M{"$gt": "已关闭"}}).Sort("-id").All(&productGetList)
+	return
+}
+
 // GetProductHeaders 定义
 func (dal *ProductDAL) GetProductHeaders(pageSize, pageNumber int) (productGetList []*types.ProductHeader_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
