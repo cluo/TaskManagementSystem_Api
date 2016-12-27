@@ -164,9 +164,9 @@ func (dal *ProjectDAL) GetProjectDetail(id string) (projectGet *types.Project_Ge
 		projectGet.DevelopmentManager = emp.Name
 	}
 	product := new(types.ProductName)
-	err1 = dal.mongo.Db.C("T_Products").FindId(project.RelevantProductObjectID).One(&emp)
+	err1 = dal.mongo.Db.C("T_Products").FindId(project.ParentProductObjectID).One(&emp)
 	if err1 == nil {
-		projectGet.RelevantProduct = product.Name
+		projectGet.ParentProduct = product.Name
 	}
 	return
 }
@@ -233,6 +233,13 @@ func (dal *ProjectDAL) AddProject(projectPost types.Project_Post, user types.Use
 		project.DevelopmentManagerID = nil
 	} else {
 		project.DevelopmentManagerObjectID = objectID.Oid
+	}
+	objectID = new(types.ObjectID)
+	dal.mongo.Db.C("T_Products").Find(bson.M{"id": project.ParentProductID}).One(&objectID)
+	if err1 != nil || objectID.Oid == nil {
+		project.ParentProductID = nil
+	} else {
+		project.ParentProductObjectID = objectID.Oid
 	}
 	err = dal.mongo.Collection.Insert(project)
 	if err != nil && strings.Contains(err.Error(), "E11000 duplicate key error collection:") {
