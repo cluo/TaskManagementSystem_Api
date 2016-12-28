@@ -167,15 +167,23 @@ func (dal *TaskDAL) GetTaskDetail(id string) (taskGet *types.Task_Get, err error
 	if err1 == nil {
 		taskGet.PrimaryOC = emp.Name
 	}
-	// otherExecutorsCount := len(task.OtherExecutorObjectIds)
-	// taskGet.OtherExecutors = make([]string, otherExecutorsCount, otherExecutorsCount)
-	// for index, value := range task.OtherExecutorObjectIds {
-	// 	emp = new(types.EmployeeName)
-	// 	err1 = dal.mongo.Db.C("M_Employees").FindId(value).One(&emp)
-	// 	if err1 == nil {
-	// 		taskGet.OtherExecutors[index] = *emp.Name
-	// 	}
-	// }
+	index := 0
+	otherExecutors := ""
+	for _, value := range task.OtherExecutorObjectIDs {
+		emp = new(types.EmployeeName)
+		err1 = dal.mongo.Db.C("M_Employees").FindId(value).One(&emp)
+		if err1 == nil {
+			if index == 0 {
+				otherExecutors += *emp.Name
+			} else {
+				otherExecutors += (" , " + *emp.Name)
+			}
+			index++
+		}
+	}
+	if otherExecutors != "" {
+		taskGet.OtherExecutors = &otherExecutors
+	}
 	product := new(types.ProductName)
 	err1 = dal.mongo.Db.C("T_Products").FindId(task.ParentProductObjectID).One(&emp)
 	if err1 == nil {
@@ -204,9 +212,8 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 	} else if !user.CheckPermissions(99) {
 		task.PrimaryExecutorObjectID = nil
 		task.PrimaryExecutorID = nil
-		// task.OtherExecutorObjectIds = nil
-		// task.OtherExecutorIDs = nil
-		task.OtherExecutors = nil
+		task.OtherExecutorObjectIDs = nil
+		task.OtherExecutorIDs = nil
 		task.PrimaryOCObjectID = nil
 		task.PrimaryOCID = nil
 	}
@@ -290,6 +297,27 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 	} else {
 		task.PrimaryExecutorObjectID = objectID.Oid
 	}
+	if task.OtherExecutorIDs != nil {
+		otherExecutorIds := make([]string, len(task.OtherExecutorIDs), len(task.OtherExecutorIDs))
+		otherExecutorObjectIds := make([]bson.ObjectId, len(task.OtherExecutorIDs), len(task.OtherExecutorIDs))
+		index := 0
+		for _, value := range task.OtherExecutorIDs {
+			objectID = new(types.ObjectID)
+			err1 = dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": value}).One(&objectID)
+			if err1 == nil && objectID.Oid != nil {
+				otherExecutorIds[index] = value
+				otherExecutorObjectIds[index] = *objectID.Oid
+				index++
+			}
+		}
+		if len(otherExecutorIds) > 0 && len(otherExecutorObjectIds) > 0 {
+			task.OtherExecutorIDs = otherExecutorIds
+			task.OtherExecutorObjectIDs = otherExecutorObjectIds
+		} else {
+			task.OtherExecutorIDs = nil
+			task.OtherExecutorObjectIDs = nil
+		}
+	}
 	objectID = new(types.ObjectID)
 	dal.mongo.Db.C("T_Project").Find(bson.M{"id": task.ParentProjectID}).One(&objectID)
 	if err1 != nil || objectID.Oid == nil {
@@ -310,7 +338,6 @@ func (dal *TaskDAL) AddTask(taskPost types.Task_Post, user types.UserInfo_Get) (
 	} else if err != nil {
 		return
 	}
-
 	return
 }
 
@@ -361,9 +388,7 @@ func (dal *TaskDAL) UpdateTask(id string, task types.Task_Post, user types.UserI
 	} else if !user.CheckPermissions(99) {
 		task.PrimaryExecutorObjectID = nil
 		task.PrimaryExecutorID = nil
-		// task.OtherExecutorObjectIds = nil
-		// task.OtherExecutorIDs = nil
-		task.OtherExecutors = nil
+		task.OtherExecutorIDs = nil
 		task.PrimaryOCObjectID = nil
 		task.PrimaryOCID = nil
 	}
@@ -483,12 +508,27 @@ func (dal *TaskDAL) setUpdateBsonMap(task types.Task_Post) (m map[string]interfa
 		}
 	}
 
-	if task.OtherExecutors != nil {
-		m["otherExecutors"] = *task.OtherExecutors
+	if task.OtherExecutorIDs != nil {
+		otherExecutorIds := make([]string, len(task.OtherExecutorIDs))
+		otherExecutorObjectIds := make([]bson.ObjectId, len(task.OtherExecutorIDs))
+		index := 0
+		for _, value := range task.OtherExecutorIDs {
+			objectID := new(types.ObjectID)
+			err1 := dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": value}).One(&objectID)
+			if err1 == nil && objectID.Oid != nil {
+				otherExecutorIds[index] = value
+				otherExecutorObjectIds[index] = *objectID.Oid
+				index++
+			}
+		}
+		if len(otherExecutorIds) > 0 && len(otherExecutorObjectIds) > 0 {
+			m["otherExecutorIds"] = otherExecutorIds
+			m["otherExecutorObjectIds"] = otherExecutorObjectIds
+		} else {
+			m["otherExecutorIds"] = nil
+			m["otherExecutorObjectIds"] = nil
+		}
 	}
-
-	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
 
 	if task.RequiringEndDate != nil {
 		m["requiringEndDate"] = task.RequiringEndDate

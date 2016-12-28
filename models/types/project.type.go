@@ -26,32 +26,31 @@ type ProjectHeader struct {
 	RealAcceptanceDate     *time.Time     `bson:"realAcceptanceDate" `
 }
 type Project struct {
-	OID                        bson.ObjectId  `bson:"_id"`
-	ID                         *string        `bson:"id"`
-	Name                       *string        `bson:"name" `
-	Description                *string        `bson:"description" `
-	CustomerContact            *string        `bson:"customerContact" `
-	CreatedTime                *time.Time     `bson:"createdTime"`
-	CreatorObjectID            *bson.ObjectId `bson:"creatorObjectId"`
-	CreatorID                  *string        `bson:"creatorId"`
-	PrimarySellerObjectID      *bson.ObjectId `bson:"primarySellerObjectId"`
-	PrimarySellerID            *string        `bson:"primarySellerId"`
-	RequiringAcceptanceDate    *time.Time     `bson:"requiringAcceptanceDate"`
-	ProjectManagerObjectID     *bson.ObjectId `bson:"projectManagerObjectId"`
-	ProjectManagerID           *string        `bson:"projectManagerId"`
-	ProductManagerObjectID     *bson.ObjectId `bson:"productManagerObjectId"`
-	ProductManagerID           *string        `bson:"productManagerId"`
-	DevelopmentManagerObjectID *bson.ObjectId `bson:"developmentManagerObjectId"`
-	DevelopmentManagerID       *string        `bson:"developmentManagerId"`
-	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
-	OtherExecutors        *string        `bson:"otherExecutors"`
-	PlanningReleaseDate   *time.Time     `bson:"planningReleaseDate" `
-	RealReleaseDate       *time.Time     `bson:"realReleaseDate" `
-	RealAcceptanceDate    *time.Time     `bson:"realAcceptanceDate" `
-	Status                *string        `bson:"status"`
-	ParentProductObjectID *bson.ObjectId `bson:"parentProductObjectId" `
-	ParentProductID       *string        `bson:"parentProductId"`
+	OID                        bson.ObjectId   `bson:"_id"`
+	ID                         *string         `bson:"id"`
+	Name                       *string         `bson:"name" `
+	Description                *string         `bson:"description" `
+	CustomerContact            *string         `bson:"customerContact" `
+	CreatedTime                *time.Time      `bson:"createdTime"`
+	CreatorObjectID            *bson.ObjectId  `bson:"creatorObjectId"`
+	CreatorID                  *string         `bson:"creatorId"`
+	PrimarySellerObjectID      *bson.ObjectId  `bson:"primarySellerObjectId"`
+	PrimarySellerID            *string         `bson:"primarySellerId"`
+	RequiringAcceptanceDate    *time.Time      `bson:"requiringAcceptanceDate"`
+	ProjectManagerObjectID     *bson.ObjectId  `bson:"projectManagerObjectId"`
+	ProjectManagerID           *string         `bson:"projectManagerId"`
+	ProductManagerObjectID     *bson.ObjectId  `bson:"productManagerObjectId"`
+	ProductManagerID           *string         `bson:"productManagerId"`
+	DevelopmentManagerObjectID *bson.ObjectId  `bson:"developmentManagerObjectId"`
+	DevelopmentManagerID       *string         `bson:"developmentManagerId"`
+	OtherExecutorObjectIDs     []bson.ObjectId `bson:"otherExecutorObjectIds"`
+	OtherExecutorIDs           []string        `bson:"otherExecutorIds"`
+	PlanningReleaseDate        *time.Time      `bson:"planningReleaseDate" `
+	RealReleaseDate            *time.Time      `bson:"realReleaseDate" `
+	RealAcceptanceDate         *time.Time      `bson:"realAcceptanceDate" `
+	Status                     *string         `bson:"status"`
+	ParentProductObjectID      *bson.ObjectId  `bson:"parentProductObjectId" `
+	ParentProductID            *string         `bson:"parentProductId"`
 }
 
 type ProjectHeader_Get struct {
@@ -86,15 +85,14 @@ type Project_Get struct {
 	ProductManager          *string    `json:"productManager"`
 	DevelopmentManagerID    *string    `json:"developmentManagerId"`
 	DevelopmentManager      *string    `json:"developmentManager"`
-	// OtherExecutorIDs        []string        `json:"otherExecutorIds"`
-	// OtherExecutors          []string        `json:"otherExecutors"`
-	OtherExecutors      *string    `json:"otherExecutors"`
-	PlanningReleaseDate *time.Time `json:"planningReleaseDate" `
-	RealReleaseDate     *time.Time `json:"realReleaseDate" `
-	RealAcceptanceDate  *time.Time `json:"realAcceptanceDate" `
-	Status              *string    `json:"status"`
-	ParentProductID     *string    `json:"parentProductId"`
-	ParentProduct       *string    `json:"parentProduct"`
+	OtherExecutorIds        []string   `json:"otherExecutorIds"`
+	OtherExecutors          *string    `json:"otherExecutors"`
+	PlanningReleaseDate     *time.Time `json:"planningReleaseDate" `
+	RealReleaseDate         *time.Time `json:"realReleaseDate" `
+	RealAcceptanceDate      *time.Time `json:"realAcceptanceDate" `
+	Status                  *string    `json:"status"`
+	ParentProductID         *string    `json:"parentProductId"`
+	ParentProduct           *string    `json:"parentProduct"`
 }
 
 type Project_Post struct {
@@ -114,13 +112,11 @@ type Project_Post struct {
 	ProductManagerID           *string        `json:"productManagerId"`
 	DevelopmentManagerObjectID *bson.ObjectId `json:"developmentManagerObjectId"`
 	DevelopmentManagerID       *string        `json:"developmentManagerId"`
-	// OtherExecutorObjectIds  []bson.ObjectId `json:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `json:"otherExecutorIds"`
-	OtherExecutors        *string        `json:"otherExecutors"`
-	PlanningReleaseDate   *time.Time     `json:"planningReleaseDate" `
-	RealReleaseDate       *time.Time     `json:"realReleaseDate" `
-	RealAcceptanceDate    *time.Time     `json:"realAcceptanceDate" `
-	Status                *string        `json:"status"`
-	ParentProductObjectID *bson.ObjectId `json:"parentProductObjectId" `
-	ParentProductID       *string        `json:"parentProductId"`
+	OtherExecutorIDs           []string       `json:"otherExecutorIds"`
+	PlanningReleaseDate        *time.Time     `json:"planningReleaseDate" `
+	RealReleaseDate            *time.Time     `json:"realReleaseDate" `
+	RealAcceptanceDate         *time.Time     `json:"realAcceptanceDate" `
+	Status                     *string        `json:"status"`
+	ParentProductObjectID      *bson.ObjectId `json:"parentProductObjectId" `
+	ParentProductID            *string        `json:"parentProductId"`
 }

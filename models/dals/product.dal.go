@@ -218,6 +218,29 @@ func (dal *ProductDAL) AddProduct(productPost types.Product_Post, user types.Use
 	} else {
 		product.DevelopmentManagerObjectID = objectID.Oid
 	}
+
+	if product.OtherExecutorIDs != nil {
+		otherExecutorIds := make([]string, len(product.OtherExecutorIDs))
+		otherExecutorObjectIds := make([]bson.ObjectId, len(product.OtherExecutorIDs))
+		index := 0
+		for _, value := range product.OtherExecutorIDs {
+			objectID = new(types.ObjectID)
+			err1 = dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": value}).One(&objectID)
+			if err1 == nil && objectID.Oid != nil {
+				otherExecutorIds[index] = value
+				otherExecutorObjectIds[index] = *objectID.Oid
+				index++
+			}
+		}
+		if len(otherExecutorIds) > 0 && len(otherExecutorObjectIds) > 0 {
+			product.OtherExecutorIDs = otherExecutorIds
+			product.OtherExecutorObjectIDs = otherExecutorObjectIds
+		} else {
+			product.OtherExecutorIDs = nil
+			product.OtherExecutorObjectIDs = nil
+		}
+	}
+
 	err = dal.mongo.Collection.Insert(product)
 	if err != nil && strings.Contains(err.Error(), "E11000 duplicate key error collection:") {
 		return dal.AddProduct(productPost, user)

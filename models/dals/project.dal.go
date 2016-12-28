@@ -234,6 +234,27 @@ func (dal *ProjectDAL) AddProject(projectPost types.Project_Post, user types.Use
 	} else {
 		project.DevelopmentManagerObjectID = objectID.Oid
 	}
+	if project.OtherExecutorIDs != nil {
+		otherExecutorIds := make([]string, len(project.OtherExecutorIDs))
+		otherExecutorObjectIds := make([]bson.ObjectId, len(project.OtherExecutorIDs))
+		index := 0
+		for _, value := range project.OtherExecutorIDs {
+			objectID = new(types.ObjectID)
+			err1 = dal.mongo.Db.C("M_Employees").Find(bson.M{"empId": value}).One(&objectID)
+			if err1 == nil && objectID.Oid != nil {
+				otherExecutorIds[index] = value
+				otherExecutorObjectIds[index] = *objectID.Oid
+				index++
+			}
+		}
+		if len(otherExecutorIds) > 0 && len(otherExecutorObjectIds) > 0 {
+			project.OtherExecutorIDs = otherExecutorIds
+			project.OtherExecutorObjectIDs = otherExecutorObjectIds
+		} else {
+			project.OtherExecutorIDs = nil
+			project.OtherExecutorObjectIDs = nil
+		}
+	}
 	objectID = new(types.ObjectID)
 	dal.mongo.Db.C("T_Products").Find(bson.M{"id": project.ParentProductID}).One(&objectID)
 	if err1 != nil || objectID.Oid == nil {

@@ -34,25 +34,24 @@ type ProductHeader_Get struct {
 }
 
 type Product struct {
-	OID                        bson.ObjectId  `bson:"_id"`
-	ID                         *string        `bson:"id"`
-	Name                       *string        `bson:"name" `
-	Description                *string        `bson:"description" `
-	CreatedTime                *time.Time     `bson:"createdTime"`
-	CreatorObjectID            *bson.ObjectId `bson:"creatorObjectId"`
-	CreatorID                  *string        `bson:"creatorId"`
-	ProductManagerObjectID     *bson.ObjectId `bson:"productManagerObjectId"`
-	ProductManagerID           *string        `bson:"productManagerId"`
-	MarketingManagerObjectID   *bson.ObjectId `bson:"marketingManagerObjectId"`
-	MarketingManagerID         *string        `bson:"marketingManagerId"`
-	DevelopmentManagerObjectID *bson.ObjectId `bson:"developmentManagerObjectId"`
-	DevelopmentManagerID       *string        `bson:"developmentManagerId"`
-	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
-	OtherExecutors      *string    `bson:"otherExecutors"`
-	PlanningReleaseDate *time.Time `bson:"planningReleaseDate" `
-	RealReleaseDate     *time.Time `bson:"realReleaseDate" `
-	Status              *string    `bson:"status"`
+	OID                        bson.ObjectId   `bson:"_id"`
+	ID                         *string         `bson:"id"`
+	Name                       *string         `bson:"name" `
+	Description                *string         `bson:"description" `
+	CreatedTime                *time.Time      `bson:"createdTime"`
+	CreatorObjectID            *bson.ObjectId  `bson:"creatorObjectId"`
+	CreatorID                  *string         `bson:"creatorId"`
+	ProductManagerObjectID     *bson.ObjectId  `bson:"productManagerObjectId"`
+	ProductManagerID           *string         `bson:"productManagerId"`
+	MarketingManagerObjectID   *bson.ObjectId  `bson:"marketingManagerObjectId"`
+	MarketingManagerID         *string         `bson:"marketingManagerId"`
+	DevelopmentManagerObjectID *bson.ObjectId  `bson:"developmentManagerObjectId"`
+	DevelopmentManagerID       *string         `bson:"developmentManagerId"`
+	OtherExecutorObjectIDs     []bson.ObjectId `bson:"otherExecutorObjectIds"`
+	OtherExecutorIDs           []string        `bson:"otherExecutorIds"`
+	PlanningReleaseDate        *time.Time      `bson:"planningReleaseDate" `
+	RealReleaseDate            *time.Time      `bson:"realReleaseDate" `
+	Status                     *string         `bson:"status"`
 }
 
 type Product_Get struct {
@@ -69,11 +68,11 @@ type Product_Get struct {
 	MarketingManager     *string       `json:"marketingManager"`
 	DevelopmentManagerID *string       `json:"developmentManagerId"`
 	DevelopmentManager   *string       `json:"developmentManager"`
-	// OtherExecutorIDs        []string        `json:"otherExecutorIds"`
-	OtherExecutors      *string    `json:"otherExecutors"`
-	PlanningReleaseDate *time.Time `json:"planningReleaseDate" `
-	RealReleaseDate     *time.Time `json:"realReleaseDate" `
-	Status              *string    `json:"status"`
+	OtherExecutorIDs     []string      `json:"otherExecutorIds"`
+	OtherExecutors       *string       `json:"otherExecutors"`
+	PlanningReleaseDate  *time.Time    `json:"planningReleaseDate" `
+	RealReleaseDate      *time.Time    `json:"realReleaseDate" `
+	Status               *string       `json:"status"`
 }
 
 type Product_Post struct {
@@ -89,10 +88,8 @@ type Product_Post struct {
 	MarketingManagerID         *string        `json:"marketingManagerId"`
 	DevelopmentManagerObjectID *bson.ObjectId `json:"developmentManagerObjectId"`
 	DevelopmentManagerID       *string        `json:"developmentManagerId"`
-	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
-	OtherExecutors      *string    `json:"otherExecutors"`
-	PlanningReleaseDate *time.Time `json:"planningReleaseDate" `
-	RealReleaseDate     *time.Time `json:"realReleaseDate" `
-	Status              *string    `json:"status"`
+	OtherExecutorIDs           []string       `json:"otherExecutorIds"`
+	PlanningReleaseDate        *time.Time     `json:"planningReleaseDate" `
+	RealReleaseDate            *time.Time     `json:"realReleaseDate" `
+	Status                     *string        `json:"status"`
 }

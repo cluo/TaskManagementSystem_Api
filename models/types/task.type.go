@@ -40,35 +40,34 @@ type TaskScreen struct {
 }
 
 type Task struct {
-	OID                     bson.ObjectId  `bson:"_id"`
-	ID                      *string        `bson:"id"`
-	Name                    *string        `bson:"name" `
-	Description             *string        `bson:"description" `
-	CustomerContact         *string        `bson:"customerContact" `
-	CreatedTime             *time.Time     `bson:"createdTime"`
-	CreatorObjectID         *bson.ObjectId `bson:"creatorObjectId"`
-	CreatorID               *string        `bson:"creatorId"`
-	PrimarySellerObjectID   *bson.ObjectId `bson:"primarySellerObjectId"`
-	PrimarySellerID         *string        `bson:"primarySellerId"`
-	PrimaryOCObjectID       *bson.ObjectId `bson:"primaryOCObjectId"`
-	PrimaryOCID             *string        `bson:"primaryOCId"`
-	PrimaryExecutorObjectID *bson.ObjectId `bson:"primaryExecutorObjectId"`
-	PrimaryExecutorID       *string        `bson:"primaryExecutorId"`
-	// OtherExecutorObjectIds  []bson.ObjectId `bson:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
-	OtherExecutors        *string        `bson:"otherExecutors"`
-	RequiringEndDate      *time.Time     `bson:"requiringEndDate"`
-	PlanningBeginDate     *time.Time     `bson:"planningBeginDate" `
-	PlanningEndDate       *time.Time     `bson:"planningEndDate" `
-	RealBeginDate         *time.Time     `bson:"realBeginDate" `
-	RealEndDate           *time.Time     `bson:"realEndDate" `
-	Percent               *int           `bson:"percent"`
-	Status                *string        `bson:"status"`
-	RefuseStatus          *string        `bson:"refuseStatus"`
-	ParentProductObjectID *bson.ObjectId `bson:"parentProductObjectId" `
-	ParentProductID       *string        `bson:"parentProductId"`
-	ParentProjectObjectID *bson.ObjectId `bson:"parentProjectObjectId" `
-	ParentProjectID       *string        `bson:"parentProjectId"`
+	OID                     bson.ObjectId   `bson:"_id"`
+	ID                      *string         `bson:"id"`
+	Name                    *string         `bson:"name" `
+	Description             *string         `bson:"description" `
+	CustomerContact         *string         `bson:"customerContact" `
+	CreatedTime             *time.Time      `bson:"createdTime"`
+	CreatorObjectID         *bson.ObjectId  `bson:"creatorObjectId"`
+	CreatorID               *string         `bson:"creatorId"`
+	PrimarySellerObjectID   *bson.ObjectId  `bson:"primarySellerObjectId"`
+	PrimarySellerID         *string         `bson:"primarySellerId"`
+	PrimaryOCObjectID       *bson.ObjectId  `bson:"primaryOCObjectId"`
+	PrimaryOCID             *string         `bson:"primaryOCId"`
+	PrimaryExecutorObjectID *bson.ObjectId  `bson:"primaryExecutorObjectId"`
+	PrimaryExecutorID       *string         `bson:"primaryExecutorId"`
+	OtherExecutorObjectIDs  []bson.ObjectId `bson:"otherExecutorObjectIds"`
+	OtherExecutorIDs        []string        `bson:"otherExecutorIds"`
+	RequiringEndDate        *time.Time      `bson:"requiringEndDate"`
+	PlanningBeginDate       *time.Time      `bson:"planningBeginDate" `
+	PlanningEndDate         *time.Time      `bson:"planningEndDate" `
+	RealBeginDate           *time.Time      `bson:"realBeginDate" `
+	RealEndDate             *time.Time      `bson:"realEndDate" `
+	Percent                 *int            `bson:"percent"`
+	Status                  *string         `bson:"status"`
+	RefuseStatus            *string         `bson:"refuseStatus"`
+	ParentProductObjectID   *bson.ObjectId  `bson:"parentProductObjectId" `
+	ParentProductID         *string         `bson:"parentProductId"`
+	ParentProjectObjectID   *bson.ObjectId  `bson:"parentProjectObjectId" `
+	ParentProjectID         *string         `bson:"parentProjectId"`
 }
 type EmployeeName struct {
 	Name *string `bson:"name"`
@@ -123,7 +122,7 @@ type Task_Get struct {
 	PrimaryOC         *string    `json:"primaryOC"`
 	PrimaryExecutorID *string    `json:"primaryExecutorId"`
 	PrimaryExecutor   *string    `json:"primaryExecutor"`
-	// OtherExecutorIds  []string   `json:"otherExecutorIds"`
+	OtherExecutorIDs  []string   `json:"otherExecutorIds"`
 	OtherExecutors    *string    `json:"otherExecutors"`
 	RequiringEndDate  *time.Time `json:"requiringEndDate"`
 	PlanningBeginDate *time.Time `json:"planningBeginDate"`
@@ -153,20 +152,18 @@ type Task_Post struct {
 	PrimaryOCID             *string        `json:"primaryOCId"`
 	PrimaryExecutorObjectID *bson.ObjectId `json:"primaryExecutorObjectId"`
 	PrimaryExecutorID       *string        `json:"primaryExecutorId"`
-	// OtherExecutorObjectIds  []bson.ObjectId `json:"otherExecutorObjectIds"`
-	// OtherExecutorIDs        []string        `json:"otherExecutorIds"`
-	OtherExecutors        *string        `json:"otherExecutors"`
-	RequiringEndDate      *time.Time     `json:"requiringEndDate"`
-	PlanningBeginDate     *time.Time     `json:"planningBeginDate" `
-	PlanningEndDate       *time.Time     `json:"planningEndDate" `
-	RealBeginDate         *time.Time     `json:"realBeginDate" `
-	RealEndDate           *time.Time     `json:"realEndDate" `
-	Percent               *int           `json:"percent"`
-	Status                *string        `json:"status"`
-	RefuseStatus          *string        `json:"refuseStatus"`
-	RefuseReason          *string        `json:"refuseReason"`
-	ParentProductObjectID *bson.ObjectId `json:"parentProductObjectId" `
-	ParentProductID       *string        `json:"parentProductId"`
-	ParentProjectObjectID *bson.ObjectId `json:"parentProjectObjectId" `
-	ParentProjectID       *string        `json:"parentProjectId"`
+	OtherExecutorIDs        []string       `json:"otherExecutorIds"`
+	RequiringEndDate        *time.Time     `json:"requiringEndDate"`
+	PlanningBeginDate       *time.Time     `json:"planningBeginDate" `
+	PlanningEndDate         *time.Time     `json:"planningEndDate" `
+	RealBeginDate           *time.Time     `json:"realBeginDate" `
+	RealEndDate             *time.Time     `json:"realEndDate" `
+	Percent                 *int           `json:"percent"`
+	Status                  *string        `json:"status"`
+	RefuseStatus            *string        `json:"refuseStatus"`
+	RefuseReason            *string        `json:"refuseReason"`
+	ParentProductObjectID   *bson.ObjectId `json:"parentProductObjectId" `
+	ParentProductID         *string        `json:"parentProductId"`
+	ParentProjectObjectID   *bson.ObjectId `json:"parentProjectObjectId" `
+	ParentProjectID         *string        `json:"parentProjectId"`
 }
