@@ -3,8 +3,13 @@ package dals
 import (
 	"TaskManagementSystem_Api/models/common"
 	"TaskManagementSystem_Api/models/types"
+	"fmt"
 	"io"
 	"mime/multipart"
+	"strconv"
+	"strings"
+
+	"github.com/astaxie/beego/context"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -74,6 +79,36 @@ func (dal *AttachmentDAL) UploadProductAttachment(productID string, filename str
 }
 
 // DownloadAttachment 定义
-func (dal *AttachmentDAL) DownloadAttachment(fileID string) (err error) {
+func (dal *AttachmentDAL) DownloadAttachment(fileID string, writer *context.Response) (errStatusCode int, err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		errStatusCode = 501
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+
+	f, err1 := dal.mongo.Db.GridFS("fs").OpenId(bson.ObjectIdHex(fileID))
+	if err1 != nil {
+		errStatusCode = 404
+		err = err1
+		return
+	}
+
+	size := f.Size()
+	writer.Header().Set("Content-Disposition",
+		fmt.Sprintf(`inline; filename="%s"`, escapeQuotes(f.Name())))
+	writer.Header().Set("Content-Length", strconv.FormatInt(size, 10))
+	_, err = io.Copy(writer, f)
+	if err != nil {
+		errStatusCode = 501
+	}
+	f.Close()
 	return
+}
+
+var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
+
+func escapeQuotes(s string) string {
+	return quoteEscaper.Replace(s)
 }

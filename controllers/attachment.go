@@ -15,15 +15,15 @@ type AttachmentController struct {
 
 func (u *AttachmentController) UploadProductAttachment() {
 	body := &ResponeBodyStruct{}
-	// token := u.Ctx.Input.Header("X-Auth-Token")
-	// _, err := (&blls.UserBLL{}).ValidateToken(token)
-	// if err != nil {
-	// 	body.Error = err.Error()
-	// 	u.Data["json"] = body
-	// 	u.Ctx.Output.SetStatus(401)
-	// 	u.ServeJSON()
-	// 	return
-	// }
+	token := u.Ctx.Input.Header("X-Auth-Token")
+	_, err := (&blls.UserBLL{}).ValidateToken(token)
+	if err != nil {
+		body.Error = err.Error()
+		u.Data["json"] = body
+		u.Ctx.Output.SetStatus(401)
+		u.ServeJSON()
+		return
+	}
 	tid := u.GetString(":tid")
 	f, h, err := u.GetFile("file")
 	if tid != "" && err == nil {
@@ -71,8 +71,16 @@ func (u *AttachmentController) DownloadAttachment() {
 		body.Error = err.Error()
 		u.Data["json"] = body
 		u.Ctx.Output.SetStatus(401)
-		u.ServeJSON()
 		return
 	}
-
+	fid := u.GetString(":fid")
+	if fid != "" {
+		errStatusCode, err := (&blls.AttachmentBLL{}).DownloadAttachment(fid, u.Ctx.ResponseWriter)
+		if err != nil {
+			u.Ctx.Output.SetStatus(errStatusCode)
+		}
+	} else {
+		u.Ctx.Output.SetStatus(404)
+	}
+	return
 }

@@ -38,7 +38,7 @@ func init() {
 	beego.Router("/v1/project/:tid", &controllers.ProjectController{}, "get:Get;delete:Delete")
 	beego.Router("/v1/project/:tid/:method", &controllers.ProjectController{}, "put:Put")
 
-	beego.Router("/v1/attachment/product/:fid", &controllers.AttachmentController{}, "get:DownloadAttachment")
+	beego.Router("/v1/attachment/:fid", &controllers.AttachmentController{}, "get:DownloadAttachment")
 	beego.Router("/v1/attachment/product/:tid/upload", &controllers.AttachmentController{}, "post:UploadProductAttachment")
 
 	beego.Router("/v1/communication/:id", &controllers.CommunicationController{}, "get:Get")
