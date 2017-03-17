@@ -29,8 +29,8 @@ func (dal *CommunicationDAL) GetCommunications(id string) (communicationsGet []*
 
 	var communications []*types.Communication
 	dal.mongo.Collection.Find(bson.M{"relevantId": id}).Sort("sentTime").All(&communications)
-	communicationCount := len(communications)
-	communicationsGet = make([]*types.Communication_Get, communicationCount, communicationCount)
+	communicationsCount := len(communications)
+	communicationsGet = make([]*types.Communication_Get, communicationsCount, communicationsCount)
 	for index, value := range communications {
 		communicationGet := new(types.Communication_Get)
 		common.StructDeepCopy(value, communicationGet)
@@ -58,8 +58,8 @@ func (dal *CommunicationDAL) AddCommunication(communicationPost types.Communicat
 	dal.mongo.UseDB("local")
 	objectID := new(types.ObjectID)
 	err = dal.mongo.Db.C("T_Tasks").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	err = dal.mongo.Db.C("T_Project").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
-	err = dal.mongo.Db.C("T_Product").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
+	err = dal.mongo.Db.C("T_Projects").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
+	err = dal.mongo.Db.C("T_Products").Find(bson.M{"id": communication.RelevantID}).One(&objectID)
 	if bson.ObjectId.Valid(*objectID.Oid) {
 		communication.RelevantObjectID = objectID.Oid
 	} else {

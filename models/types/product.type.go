@@ -51,6 +51,7 @@ type Product struct {
 	OtherExecutorIDs           []string        `bson:"otherExecutorIds"`
 	PlanningReleaseDate        *time.Time      `bson:"planningReleaseDate" `
 	RealReleaseDate            *time.Time      `bson:"realReleaseDate" `
+	Percent                    *int            `bson:"percent"`
 	Status                     *string         `bson:"status"`
 }
 
@@ -72,6 +73,7 @@ type Product_Get struct {
 	OtherExecutors       *string       `json:"otherExecutors"`
 	PlanningReleaseDate  *time.Time    `json:"planningReleaseDate" `
 	RealReleaseDate      *time.Time    `json:"realReleaseDate" `
+	Percent              *int          `json:"percent"`
 	Status               *string       `json:"status"`
 }
 
@@ -91,5 +93,6 @@ type Product_Post struct {
 	OtherExecutorIDs           []string       `json:"otherExecutorIds"`
 	PlanningReleaseDate        *time.Time     `json:"planningReleaseDate" `
 	RealReleaseDate            *time.Time     `json:"realReleaseDate" `
+	Percent                    *int           `json:"percent"`
 	Status                     *string        `json:"status"`
 }

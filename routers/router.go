@@ -38,8 +38,10 @@ func init() {
 	beego.Router("/v1/project/:tid", &controllers.ProjectController{}, "get:Get;delete:Delete")
 	beego.Router("/v1/project/:tid/:method", &controllers.ProjectController{}, "put:Put")
 
-	beego.Router("/v1/attachment/:fid", &controllers.AttachmentController{}, "get:DownloadAttachment")
-	beego.Router("/v1/attachment/product/:tid/upload", &controllers.AttachmentController{}, "post:UploadProductAttachment")
+	beego.Router("/v1/attachment/:tid", &controllers.AttachmentController{}, "get:Get")
+	beego.Router("/v1/attachment/file/:fid", &controllers.AttachmentController{}, "get:DownloadAttachment")
+	beego.Router("/v1/attachment/file/:tid", &controllers.AttachmentController{}, "post:UploadAttachment;put:UploadAttachment")
+	beego.Router("/v1/attachment/file/:fid", &controllers.AttachmentController{}, "delete:DeleteAttachment")
 
 	beego.Router("/v1/communication/:id", &controllers.CommunicationController{}, "get:Get")
 	beego.Router("/v1/communication", &controllers.CommunicationController{}, "post:Post")

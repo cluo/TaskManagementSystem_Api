@@ -48,6 +48,7 @@ type Project struct {
 	PlanningReleaseDate        *time.Time      `bson:"planningReleaseDate" `
 	RealReleaseDate            *time.Time      `bson:"realReleaseDate" `
 	RealAcceptanceDate         *time.Time      `bson:"realAcceptanceDate" `
+	Percent                    *int            `bson:"percent"`
 	Status                     *string         `bson:"status"`
 	ParentProductObjectID      *bson.ObjectId  `bson:"parentProductObjectId" `
 	ParentProductID            *string         `bson:"parentProductId"`
@@ -90,6 +91,7 @@ type Project_Get struct {
 	PlanningReleaseDate     *time.Time `json:"planningReleaseDate" `
 	RealReleaseDate         *time.Time `json:"realReleaseDate" `
 	RealAcceptanceDate      *time.Time `json:"realAcceptanceDate" `
+	Percent                 *int       `json:"percent"`
 	Status                  *string    `json:"status"`
 	ParentProductID         *string    `json:"parentProductId"`
 	ParentProduct           *string    `json:"parentProduct"`
@@ -116,6 +118,7 @@ type Project_Post struct {
 	PlanningReleaseDate        *time.Time     `json:"planningReleaseDate" `
 	RealReleaseDate            *time.Time     `json:"realReleaseDate" `
 	RealAcceptanceDate         *time.Time     `json:"realAcceptanceDate" `
+	Percent                    *int           `json:"percent"`
 	Status                     *string        `json:"status"`
 	ParentProductObjectID      *bson.ObjectId `json:"parentProductObjectId" `
 	ParentProductID            *string        `json:"parentProductId"`

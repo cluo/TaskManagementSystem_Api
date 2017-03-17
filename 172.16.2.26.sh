@@ -5,7 +5,7 @@
 #     211.157.146.6:5000/oauth-server-service \
 #     211.157.146.6:5000/task-nginx
 
-# docker run -d --name=ambassador --expose 27017 --expose 5432 --expose 6379 -e MONGO_PORT_27017_TCP=tcp://172.16.2.40:27017  -e DB_PORT_5432_TCP=tcp://172.16.2.40:5432 -e REDIS_PORT_6379_TCP=tcp://172.16.2.40:6379 211.157.146.6:5000/ambassador:latest
+# docker run -d --name=ambassador --expose 27017 --expose 5432 --expose 6379 -e MONGO_PORT_27017_TCP=tcp://172.16.0.114:27017  -e DB_PORT_5432_TCP=tcp://172.16.0.114:5432 -e REDIS_PORT_6379_TCP=tcp://172.16.0.114:6379 211.157.146.6:5000/ambassador:latest
 # docker run -d --name=frontend1 211.157.146.6:5000/task-management-frontend
 # docker run -d --name=frontend2 211.157.146.6:5000/task-management-frontend
 # docker run -d --name=frontend3 211.157.146.6:5000/task-management-frontend
@@ -30,22 +30,22 @@ docker rmi 211.157.146.6:5000/task-management-api \
     211.157.146.6:5000/oauth-server-service \
     211.157.146.6:5000/task-nginx
 docker run -d -e TZ="Asia/Shanghai" --name=ambassador --expose 27017 --expose 6379 \
-    -e MONGO_PORT_27017_TCP=tcp://172.16.2.40:27017 \
-    -e REDIS_PORT_6379_TCP=tcp://172.16.2.40:6379 \
+    -e MONGO_PORT_27017_TCP=tcp://172.16.0.114:27017 \
+    -e REDIS_PORT_6379_TCP=tcp://172.16.0.114:6379 \
     211.157.146.6:5000/ambassador:latest
 docker run -d -e TZ="Asia/Shanghai" --name=frontend1 211.157.146.6:5000/task-management-frontend
 docker run -d -e TZ="Asia/Shanghai" --link ambassador:mongo --link ambassador:redis --name=api1 211.157.146.6:5000/task-management-api
 docker run -d -e TZ="Asia/Shanghai" --name=task-nginx \
-    -p 6001:6001 -p 6002:6002-p 6006:6006 -p 6009:6009 \
+    -p 6001:6001 -p 6002:6002 -p 6006:6006 -p 6009:6009 \
     --link frontend1:frontend1 --link api1:api1 \
     211.157.146.6:5000/task-nginx
 
 docker run -it -e TZ="Asia/Shanghai" --link ambassador:mongo --link ambassador:redis --name=api1 211.157.146.6:5000/task-management-api bash
 
 docker run -d -e TZ="Asia/Shanghai" --name=ambassador --expose 80 --expose 27017 --expose 6379 \
-    -e MONGO_PORT_27017_TCP=tcp://172.16.2.40:27017 \
-    -e REDIS_PORT_6379_TCP=tcp://172.16.2.40:6379 \
-    -e API2_PORT_80_TCP=tcp://172.16.2.40:80 \
+    -e MONGO_PORT_27017_TCP=tcp://172.16.0.114:27017 \
+    -e REDIS_PORT_6379_TCP=tcp://172.16.0.114:6379 \
+    -e API2_PORT_80_TCP=tcp://172.16.0.114:80 \
     211.157.146.6:5000/ambassador:latest
 docker run -d -e TZ="Asia/Shanghai" --name=task-nginx -p 6001:6001 -p 6009:6009 \
     --link frontend1:frontend1 --link api1:api1 --link ambassador:api2 \

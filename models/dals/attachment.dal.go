@@ -11,6 +11,8 @@ import (
 
 	"github.com/astaxie/beego/context"
 
+	"errors"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -19,14 +21,40 @@ type AttachmentDAL struct {
 	mongo *common.MongoSessionStruct
 }
 
-// UploadProductAttachment 定义
-func (dal *AttachmentDAL) UploadProductAttachment(productID string, filename string, f multipart.File) (err error) {
+// GetAttachmentList 定义
+func (dal *AttachmentDAL) GetAttachmentList(id string) (attachmentsGet []*types.Attachment_Get, err error) {
 	dal.mongo, err = common.GetMongoSession()
 	if err != nil {
 		return
 	}
 	defer dal.mongo.CloseSession()
 	dal.mongo.UseDB("local")
+	err = dal.mongo.UseCollection("T_Attachments")
+	if err != nil {
+		return
+	}
+
+	err = dal.mongo.Collection.Find(bson.M{"relevantId": id}).All(&attachmentsGet)
+	return
+}
+
+// UploadAttachment 定义
+func (dal *AttachmentDAL) UploadAttachment(id string, filename string, f multipart.File) (err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+
+	objectID := new(types.ObjectID)
+	err = dal.mongo.Db.C("T_Tasks").Find(bson.M{"id": id}).One(&objectID)
+	err = dal.mongo.Db.C("T_Projects").Find(bson.M{"id": id}).One(&objectID)
+	err = dal.mongo.Db.C("T_Products").Find(bson.M{"id": id}).One(&objectID)
+	if objectID.Oid == nil || !bson.ObjectId.Valid(*objectID.Oid) {
+		err = errors.New("不存在该编号的数据。")
+		return
+	}
 
 	file, err1 := dal.mongo.Db.GridFS("fs").Create(filename)
 	if err1 != nil {
@@ -42,35 +70,18 @@ func (dal *AttachmentDAL) UploadProductAttachment(productID string, filename str
 	err = file.Close()
 	fileOid := file.Id().(bson.ObjectId)
 
-	err = dal.mongo.UseCollection("T_Products")
+	attachment := new(types.Attachment)
+	attachment.OID = bson.NewObjectId()
+	attachment.RelevantID = &id
+	attachment.RelevantObjectID = objectID.Oid
+	attachment.FileLength = &fileSize
+	attachment.FileName = &filename
+	attachment.FileObjectID = &fileOid
+	err = dal.mongo.UseCollection("T_Attachments")
 	if err != nil {
 		return
 	}
-	product := new(types.ObjectID)
-	err = dal.mongo.Collection.Find(bson.M{"id": productID}).One(product)
-	if err != nil {
-		return
-	}
-
-	err = dal.mongo.UseCollection("T_ProductAttachments")
-	if err != nil {
-		return
-	}
-
-	productAttachment := new(types.ProductAttachment)
-	productAttachment.OID = bson.NewObjectId()
-	productAttachment.FileLength = &fileSize
-	productAttachment.FileName = &filename
-	productAttachment.FileObjectID = &fileOid
-	if product.Oid == nil {
-		productAttachment.ProductID = nil
-		productAttachment.ProductObjectID = nil
-	} else {
-		productAttachment.ProductID = &productID
-		productAttachment.ProductObjectID = product.Oid
-	}
-
-	err = dal.mongo.Collection.Insert(productAttachment)
+	err = dal.mongo.Collection.Insert(attachment)
 	if err != nil {
 		return
 	}
@@ -87,7 +98,6 @@ func (dal *AttachmentDAL) DownloadAttachment(fileID string, writer *context.Resp
 	}
 	defer dal.mongo.CloseSession()
 	dal.mongo.UseDB("local")
-
 	f, err1 := dal.mongo.Db.GridFS("fs").OpenId(bson.ObjectIdHex(fileID))
 	if err1 != nil {
 		errStatusCode = 404
@@ -111,4 +121,26 @@ var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
 
 func escapeQuotes(s string) string {
 	return quoteEscaper.Replace(s)
+}
+
+// DelAttachment 定义
+func (dal *AttachmentDAL) DelAttachment(fileID string) (err error) {
+	dal.mongo, err = common.GetMongoSession()
+	if err != nil {
+		return
+	}
+	defer dal.mongo.CloseSession()
+	dal.mongo.UseDB("local")
+	err = dal.mongo.Db.GridFS("fs").RemoveId(bson.ObjectIdHex(fileID))
+	if err != nil {
+		return
+	}
+
+	err = dal.mongo.UseCollection("T_Attachments")
+	if err != nil {
+		return
+	}
+	_, err = dal.mongo.Collection.RemoveAll(bson.M{"fileObjectId": bson.ObjectIdHex(fileID)})
+
+	return
 }

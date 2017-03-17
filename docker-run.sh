@@ -7,4 +7,3 @@ docker build -t api-image .
 docker tag api-image 211.157.146.6:5000/task-management-api
 docker push 211.157.146.6:5000/task-management-api
 docker rmi api-image
-docker run -d --link "TM-mongo:mongo" -p 6001:6001 --name=api 211.157.146.6:5000/task-management-api
