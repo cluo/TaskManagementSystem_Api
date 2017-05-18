@@ -33,10 +33,18 @@ docker run -d -e TZ="Asia/Shanghai" --link task-management-mongo:mongo --link re
 
 
 
-docker kill api2 ambassador; \
-    docker rm api2 ambassador;
+docker kill api api2 ambassador; \
+    docker rm api api2 ambassador;
 docker rmi 211.157.146.6:5000/task-management-api;
 docker run -d  -e TZ="Asia/Shanghai" --link task-management-mongo:mongo --link redis:redis --name=api2 211.157.146.6:5000/task-management-api
 docker run -d  -e TZ="Asia/Shanghai" --link task-management-mongo:mongo --link redis:redis  --link api2:api2 \
     -p 27017:27017 -p 6379:6379  -p 80:80 \
     --name=ambassador 211.157.146.6:5000/ambassador:latest
+
+
+
+docker run -d -p 8888:80 \
+    --link task-management-mongo:mongo \
+    --link redis:redis --name=api \
+    211.157.146.6:5000/task-management-api
+    
